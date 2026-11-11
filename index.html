@@ -253,7 +253,7 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
   </section>
 </div>
 
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
 <script>
 (()=>{'use strict';
 const TILE=48,N=56,WORLD=N*TILE,MID=WORLD/2,WAVE=40000,TAU=6.2832,LVMAX=40,DURS=[5,10,15,20];
@@ -661,56 +661,56 @@ function pack(){
     st:H.dead?1:0,bf:H.bf,h:hits.slice(),dk:lastDeath,ck:[G.wave,...G.myCk],cc:[G.wave,...G.myCc],
     bd:G.bosses.map(B=>[B.life,Math.round(B.my),B.alive?1:0]),sx:lastSkill,a:lastAtk}}
 function pushPresence(){if(!room)return;try{const p=room.presence(pack());if(p&&p.catch)p.catch(()=>{})}catch(_){}}
-/* Rede fora do Claude: WebRTC via PeerJS. Quem cria a sala vira o ponto central e
-   repassa a presença de cada jogador; o código de 4 letras é o endereço da sala. */
-const NET={peer:null,host:null,conns:new Map(),pres:new Map(),dirty:new Set(),gone:[],code:'',isHost:false,my:'',msg:'',iv:0},PFX='arena-celeste-3-';
+/* Rede fora do Claude: cada aparelho publica a própria presença num tópico da sala em
+   retransmissores MQTT públicos (WebSocket). Não há anfitrião: quem tem o código entra,
+   e a sala existe enquanto houver alguém nela. Dois retransmissores em paralelo, o que
+   chegar primeiro vale (q é o número de sequência de cada jogador). */
+const NET={cl:[],pres:new Map(),code:'',my:'',msg:'',q:0,lastT:0,iv:0,gen:0,hello:0},TOP='arenaceleste3/',
+  BROKERS=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt'];
 function newCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ';let c='';for(let i=0;i<4;i++)c+=A[Math.random()*A.length|0];return c}
+function netSend(o){if(!NET.code)return;const t=TOP+NET.code+'/'+NET.my,m=JSON.stringify(o);for(const c of NET.cl)if(c.connected)try{c.publish(t,m,{qos:0})}catch(_){}}
+function netUp(){for(const c of NET.cl)if(c.connected)return true;return false}
 function netShim(){return{
-  presence(v){if(NET.isHost){NET.pres.set(NET.my,{s:v,at:Date.now()});NET.dirty.add(NET.my)}else if(NET.host&&NET.host.open)NET.host.send({t:'p',s:v})},
-  peers(){const a=[{isMe:true,sameTab:true,peer:NET.my,kind:'viewer',presence:null}];NET.pres.forEach((v,id)=>{if(id!==NET.my)a.push({peer:id,kind:'viewer',presence:v.s,updatedAt:v.at})});return a}}}
-function netClose(){const p=NET.peer;NET.peer=null;NET.host=null;clearInterval(NET.iv);NET.conns.clear();NET.pres.clear();NET.dirty.clear();NET.gone=[];NET.my='';NET.code='';room=null;myPeer='';
-  if(p)try{p.destroy()}catch(_){}
+  presence(v){NET.lastT=Date.now();netSend({q:++NET.q,s:v})},
+  peers(){const a=[{isMe:true,sameTab:true,peer:NET.my,kind:'viewer',presence:null}];NET.pres.forEach((v,id)=>{a.push({peer:id,kind:'viewer',presence:v.s,updatedAt:v.at})});return a}}}
+function netClose(){netSend({x:1});NET.gen++;clearInterval(NET.iv);for(const c of NET.cl)try{c.end(false)}catch(_){}
+  NET.cl=[];NET.pres.clear();NET.my='';NET.code='';room=null;myPeer='';
   if(G.state==='menu')others.clear();else others.forEach(o=>{o.gone=true});
   try{history.replaceState(null,'',location.pathname+location.search)}catch(_){}}
 function netFail(m){netClose();roomState='err';NET.msg=m;refreshMenu()}
 function netLeave(){netClose();roomState='solo';refreshMenu()}
-function netFlush(){if(!NET.dirty.size&&!NET.gone.length)return;const x=NET.gone;NET.gone=[];
-  NET.conns.forEach((c,cid)=>{if(!c.open)return;const m={};NET.dirty.forEach(id=>{if(id!==cid){const v=NET.pres.get(id);if(v)m[id]=v.s}});try{c.send({t:'m',m,x})}catch(_){}});NET.dirty.clear()}
-function netData(d){if(!d||d.t!=='m')return;
-  if(d.m&&typeof d.m==='object')for(const id in d.m){if(id!==NET.my&&d.m[id]&&typeof d.m[id]==='object')NET.pres.set(id,{s:d.m[id],at:Date.now()})}
-  if(Array.isArray(d.x))for(const id of d.x)NET.pres.delete(id)}
-function netOpen(code,host){netClose();
-  if(typeof Peer!=='function')return netFail('O módulo de rede não carregou. Confira a internet e recarregue a página.');
-  roomState='wait';NET.code=code;NET.isHost=host;refreshMenu();
-  let p;try{p=NET.peer=host?new Peer(PFX+code):new Peer()}catch(_){return netFail('Este navegador não permite a conexão entre aparelhos.')}
-  const live=()=>NET.peer===p;
-  setTimeout(()=>{if(live()&&roomState==='wait')netFail('A conexão demorou demais. Tente de novo.')},20000);
-  p.on('open',id=>{if(!live())return;NET.my=id;
-    if(host){room=netShim();roomState='on';NET.iv=setInterval(netFlush,100);try{history.replaceState(null,'','#'+code)}catch(_){}pushPresence();refreshMenu();return}
-    const c=NET.host=p.connect(PFX+code,{reliable:true});
-    c.on('open',()=>{if(!live())return;room=netShim();roomState='on';try{history.replaceState(null,'','#'+code)}catch(_){}pushPresence();refreshMenu()});
-    c.on('data',d=>{if(live())netData(d)});
-    c.on('close',()=>{if(live())netFail('A sala fechou: quem criou saiu ou a conexão caiu.')})});
-  p.on('connection',c=>{if(!live()||!host||NET.conns.size>=9){try{c.close()}catch(_){}return}
-    c.on('open',()=>{if(!live())return;NET.conns.set(c.peer,c);const m={};NET.pres.forEach((v,id)=>{m[id]=v.s});try{c.send({t:'m',m})}catch(_){}});
-    c.on('data',d=>{if(live()&&d&&d.t==='p'&&d.s&&typeof d.s==='object'){NET.pres.set(c.peer,{s:d.s,at:Date.now()});NET.dirty.add(c.peer)}});
-    const bye=()=>{if(NET.conns.get(c.peer)!==c)return;NET.conns.delete(c.peer);NET.pres.delete(c.peer);NET.dirty.delete(c.peer);NET.gone.push(c.peer)};
-    c.on('close',bye);c.on('error',bye)});
-  p.on('error',e=>{if(!live())return;const t=e&&e.type;
-    if(t==='unavailable-id'&&host)return netOpen(newCode(),true);
-    if(t==='peer-unavailable')return netFail('Sala '+code+' não encontrada. Confira o código com quem criou.');
-    if(roomState!=='on')netFail('Não foi possível conectar. Confira a internet e tente de novo.')});
-  p.on('disconnected',()=>{if(live()&&!p.destroyed)setTimeout(()=>{if(live()&&!p.destroyed)try{p.reconnect()}catch(_){}},1500)})}
+function netMsg(t,p){const id=String(t).slice(String(t).lastIndexOf('/')+1);if(id===NET.my||!/^[a-z0-9]{4,12}$/.test(id))return;
+  let d;try{d=JSON.parse(typeof p==='string'?p:new TextDecoder().decode(p))}catch(_){return}
+  if(!d||typeof d!=='object')return;if(d.x){NET.pres.delete(id);return}
+  if(!d.s||typeof d.s!=='object'||typeof d.q!=='number')return;
+  const cur=NET.pres.get(id);if(cur&&d.q<=cur.q)return;
+  if(!cur){if(NET.pres.size>=11)return;if(Date.now()-NET.hello>400){NET.hello=Date.now();setTimeout(pushPresence,60)}}
+  NET.pres.set(id,{s:d.s,at:Date.now(),q:d.q})}
+function netTick(){const t=Date.now();NET.pres.forEach((v,id)=>{if(t-v.at>7000)NET.pres.delete(id)});if(room&&t-NET.lastT>2000)pushPresence()}
+function netOpen(code){netClose();
+  if(typeof mqtt==='undefined'||typeof mqtt.connect!=='function')return netFail('O módulo de rede não carregou. Confira a internet e recarregue a página.');
+  roomState='wait';NET.code=code;NET.my=Math.random().toString(36).slice(2,10).padEnd(6,'0');NET.q=0;const gen=NET.gen,my=NET.my;refreshMenu();
+  BROKERS.forEach((url,i)=>{let c;try{c=mqtt.connect(url,{clientId:'ac3_'+my+'_'+i,clean:true,keepalive:30,reconnectPeriod:3000,connectTimeout:12000})}catch(_){return}
+    NET.cl.push(c);
+    c.on('connect',()=>{if(gen!==NET.gen)return;try{c.subscribe(TOP+code+'/+',{qos:0})}catch(_){}
+      if(roomState!=='on'){room=netShim();roomState='on';try{history.replaceState(null,'','#'+code)}catch(_){}}
+      pushPresence();refreshMenu()});
+    c.on('message',(t,p)=>{if(gen===NET.gen)netMsg(t,p)});
+    c.on('error',()=>{})});
+  if(!NET.cl.length)return netFail('Este navegador não permite a conexão de rede do jogo.');
+  NET.iv=setInterval(netTick,1000);
+  setTimeout(()=>{if(gen===NET.gen&&roomState==='wait')netFail('Não foi possível conectar ao serviço de salas. Confira a internet e tente de novo.')},20000)}
 function netInvite(){const url=location.origin+location.pathname+'#'+NET.code,msg=$('b-share'),done=t=>{msg.textContent=t;setTimeout(()=>{msg.textContent='Convidar'},1800)};
   if(navigator.share)navigator.share({title:'Arena Celeste',text:'Entra na minha sala da Arena Celeste: '+NET.code,url}).catch(()=>{});
   else if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(()=>done('Link copiado'),()=>done(NET.code));
   else done(NET.code)}
 function netInit(){
-  $('b-host').addEventListener('click',()=>netOpen(newCode(),true));
-  const inp=$('code'),join=()=>{const c=inp.value.toUpperCase().replace(/[^A-Z]/g,'');if(c.length===4)netOpen(c,false);else{roomState='err';NET.msg='O código da sala tem 4 letras.';refreshMenu()}};
+  $('b-host').addEventListener('click',()=>netOpen(newCode()));
+  const inp=$('code'),join=()=>{const c=inp.value.toUpperCase().replace(/[^A-Z]/g,'');if(c.length===4)netOpen(c);else{roomState='err';NET.msg='O código da sala tem 4 letras.';refreshMenu()}};
   $('b-join').addEventListener('click',join);inp.addEventListener('keydown',e=>{if(e.key==='Enter')join()});
   $('b-leave').addEventListener('click',netLeave);$('b-share').addEventListener('click',netInvite);
-  const h=(location.hash||'').slice(1).toUpperCase();if(/^[A-Z]{4}$/.test(h)){inp.value=h;netOpen(h,false)}}
+  addEventListener('pagehide',()=>netSend({x:1}));
+  const h=(location.hash||'').slice(1).toUpperCase();if(/^[A-Z]{4}$/.test(h)){inp.value=h;netOpen(h)}}
 function netRead(){
   if(!room)return;let ps;try{ps=room.peers()}catch(_){return}
   others.forEach(o=>{o.gone=true});let adopt=null;const e=now();
@@ -1139,11 +1139,11 @@ function renderEnd(){const l=board(),tb=$('rank').tBodies[0];tb.textContent='';
 function refreshMenu(){
   if(G.state!=='menu')return;const msg=$('room-msg'),ul=$('room-list'),go=$('b-go');ul.textContent='';
   $('room-ctl').hidden=roomState==='on'||roomState==='wait';$('room-on').hidden=roomState!=='on';$('room-code').textContent=NET.code;
-  if(roomState==='wait')msg.textContent=NET.isHost?'Criando a sala…':'Entrando na sala '+NET.code+'…';
+  if(roomState==='wait')msg.textContent='Conectando à sala '+NET.code+'…';
   else if(roomState==='err')msg.textContent=NET.msg;
   else if(roomState==='solo')msg.textContent='Para jogar com amigos, crie uma sala e passe o código, ou entre com o código de alguém. Sem sala, você joga sozinho.';
   else{const list=[];others.forEach(o=>{if(!o.gone)list.push(o)});
-    msg.textContent=list.length?'Na sala agora:':'Sala aberta, só você por enquanto. Toque em Convidar para mandar o link.';
+    msg.textContent=!netUp()?'Sem conexão no momento, tentando reconectar…':list.length?'Na sala agora:':'Só você na sala por enquanto. Toque em Convidar para mandar o link.';
     const add=(s,you)=>{const li=document.createElement('li');li.textContent=s;if(you)li.className='you';ul.appendChild(li)};
     if(list.length){add(P.name+' (você)',true);list.forEach(o=>add(o.name+(o.mid&&Date.now()-o.at<4000&&o.e<o.dur?' · em partida':'')))}}
   const j=joinable();go.textContent=j?'Entrar na partida de '+j.o.name+' · '+fmt(j.o.dur-Math.max(0,j.est)):'Iniciar partida'}
@@ -1179,7 +1179,7 @@ function start(data){
   addEventListener('keydown',e=>{if(e.target&&e.target.tagName==='INPUT')return;keys.add(e.code);if(G.state==='play'){if(e.code==='Space'){e.preventDefault();cast(0)}else if(e.code==='KeyE'||e.code==='KeyR')cast(1);else if(e.code==='KeyQ')potion();else if(e.code==='KeyT')sheet(G.sheet==='tal'?'':'tal');else if(e.code==='KeyB')sheet(G.sheet==='shop'?'':'shop')}});
   addEventListener('keyup',e=>keys.delete(e.code));addEventListener('blur',()=>{keys.clear();stick.id=null});
   netInit();refreshMenu();
-  setInterval(()=>{if(G.state==='play')pushPresence()},90);
+  setInterval(()=>{if(G.state==='play')pushPresence()},110);
   setInterval(()=>{hud();refreshMenu()},140);
   let last=performance.now(),fr=0;
   const frame=t=>{const dt=Math.min(.05,Math.max(.001,(t-last)/1000));last=t;netRead();
