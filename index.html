@@ -281,11 +281,11 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
 (()=>{'use strict';
 const TILE=48,N=56,WORLD=N*TILE,MID=WORLD/2,WAVE=40000,TAU=6.2832,LVMAX=40,DURS=[5,10,15,20];
 const CLS=[
- {n:'Paladino',hp:640,dmg:34,range:66,itv:.9,spd:182,arm:4,proj:0,
-  s1:{n:'Julgamento',cd:8,d:'golpe em área que também cura você.'},s2:{n:'Ira Celestial',cd:60,d:'explosão sagrada; por 8 s você causa +50% de dano e sofre metade.'}},
+ {n:'Paladino',hp:560,dmg:29,range:66,itv:.9,spd:182,arm:3,proj:0,
+  s1:{n:'Julgamento',cd:8,d:'golpe em área que também cura você.'},s2:{n:'Ira Celestial',cd:60,d:'explosão sagrada; por 6 s você causa +30% de dano e sofre 35% menos.'}},
  {n:'Caçadora',hp:430,dmg:30,range:240,itv:.72,spd:198,arm:1,proj:1,
   s1:{n:'Rajada',cd:7,d:'leque de flechas que atinge tudo à frente.'},s2:{n:'Chuva de Flechas',cd:60,d:'flechas caem por 4 s sobre uma área grande.'}},
- {n:'Arcanista',hp:390,dmg:27,range:220,itv:1,spd:186,arm:0,proj:2,
+ {n:'Arcanista',hp:410,dmg:28,range:220,itv:1,spd:186,arm:0,proj:2,
   s1:{n:'Nova Estelar',cd:9,d:'explosão no alvo depois de um instante.'},s2:{n:'Meteoro',cd:60,d:'meteoro devastador que deixa o chão em chamas.'}}];
 /* Aparência dos heróis: cada visual é só uma paleta. Novos visuais entram aqui. */
 const SKIN=[
@@ -294,9 +294,9 @@ const SKIN=[
  {cloth:'#5346a8',cloth2:'#3a2f7e',trim:'#e2b24c',glow:'#63c7d6',dark:'#1b1736',wood:'#8a6a4a'}];
 /* Árvore de talentos: 3 ramos por herói, 3 nós por ramo. */
 const TAL=[
- [{b:'Fúria',n:[{id:'dmg',n:'Lâmina Sagrada',m:3,d:'+8% de dano por ponto'},{id:'cleave',n:'Golpe Amplo',m:3,d:'Ataques ferem quem está ao lado do alvo: 25% do dano por ponto'},{id:'exec',n:'Executor',m:1,d:'+35% de dano em alvos com menos de 35% de vida'}]},
-  {b:'Baluarte',n:[{id:'hp',n:'Pele de Aço',m:3,d:'+10% de vida por ponto'},{id:'regen',n:'Fé Inabalável',m:3,d:'Regenera 0,6% da vida por segundo por ponto'},{id:'aegis',n:'Égide',m:1,d:'Abaixo de 30% de vida, fica invulnerável por 2,5 s. Recarga: 45 s'}]},
-  {b:'Luz',n:[{id:'s1',n:'Julgamento Maior',m:3,d:'+20% de dano do Julgamento por ponto'},{id:'cdr',n:'Devoção',m:3,d:'-8% de recarga das habilidades por ponto'},{id:'ult',n:'Ira Prolongada',m:1,d:'Ira Celestial dura 4 s a mais'}]}],
+ [{b:'Fúria',n:[{id:'dmg',n:'Lâmina Sagrada',m:3,d:'+8% de dano por ponto'},{id:'cleave',n:'Golpe Amplo',m:3,d:'Ataques ferem quem está ao lado do alvo: 20% do dano por ponto'},{id:'exec',n:'Executor',m:1,d:'+35% de dano em alvos com menos de 35% de vida'}]},
+  {b:'Baluarte',n:[{id:'hp',n:'Pele de Aço',m:3,d:'+10% de vida por ponto'},{id:'regen',n:'Fé Inabalável',m:3,d:'Regenera 0,4% da vida por segundo por ponto'},{id:'aegis',n:'Égide',m:1,d:'Abaixo de 30% de vida, fica invulnerável por 2 s. Recarga: 60 s'}]},
+  {b:'Luz',n:[{id:'s1',n:'Julgamento Maior',m:3,d:'+20% de dano do Julgamento por ponto'},{id:'cdr',n:'Devoção',m:3,d:'-8% de recarga das habilidades por ponto'},{id:'ult',n:'Ira Prolongada',m:1,d:'Ira Celestial dura 3 s a mais'}]}],
  [{b:'Precisão',n:[{id:'dmg',n:'Olho de Águia',m:3,d:'+8% de dano por ponto'},{id:'crit',n:'Tiro Crítico',m:3,d:'10% de chance de dano em dobro por ponto'},{id:'pierce',n:'Flecha Perfurante',m:1,d:'Flechas atravessam o alvo e ferem quem está atrás'}]},
   {b:'Agilidade',n:[{id:'spd',n:'Passo Leve',m:3,d:'+5% de movimento por ponto'},{id:'aspd',n:'Mãos Rápidas',m:3,d:'+8% de velocidade de ataque por ponto'},{id:'dodge',n:'Esquiva',m:1,d:'20% de chance de evitar um golpe'}]},
   {b:'Caça',n:[{id:'s1',n:'Rajada Maior',m:3,d:'+20% de dano da Rajada por ponto'},{id:'cdr',n:'Instinto',m:3,d:'-8% de recarga das habilidades por ponto'},{id:'ult',n:'Tempestade',m:1,d:'Chuva de Flechas dura 2 s a mais e deixa os atingidos lentos'}]}],
@@ -457,10 +457,10 @@ function gainXp(v){H.xp+=v;while(H.lv<LVMAX&&H.xp>=need(H.lv)){H.xp-=need(H.lv);
   toast(H.lv===4?'Nível 4: suas asas despontaram. +1 ponto de talento':H.lv===10?'Nível 10: você ganhou a auréola. +1 ponto de talento':'Nível '+H.lv+': +1 ponto de talento')}}
 function hurt(d,by,pure,quiet,flag){const e=now();if(H.dead||e<H.inv||e<0)return;
   if(!pure){if(tr('dodge')&&Math.random()<.2){ftext(H.x,H.y-72,'esquiva','#bfe6a8');return}
-    d*=100/(100+H.arm*6)*(1-.06*tr('ward'))*(e<H.wrath?.5:1)}
+    d*=100/(100+H.arm*6)*(1-.06*tr('ward'))*(e<H.wrath?.65:1)}
   H.hp-=d;if(flag===1)H.slow=e+1500;
   if(!quiet){H.hurtAt=e;H.flash=.12;ftext(H.x,H.y-70,'-'+Math.max(1,Math.round(d)),'#ff8a7a');burst(H.x,H.y-26,3,'#ff8a7a',80,.3,3);if(d>H.mhp*.12)shake(5)}
-  if(H.hp>0&&H.hp<H.mhp*.3&&tr('aegis')&&e>H.aegisCd){H.aegisCd=e+45000;H.inv=e+2500;fx('ring',H.x,H.y,{r:60,col:'#9fe8f5'});toast('Égide: invulnerável por 2,5 s')}
+  if(H.hp>0&&H.hp<H.mhp*.3&&tr('aegis')&&e>H.aegisCd){H.aegisCd=e+60000;H.inv=e+2000;fx('ring',H.x,H.y,{r:60,col:'#9fe8f5'});toast('Égide: invulnerável por 2 s')}
   if(H.hp<=0){
     if(tr('phoenix')&&e>H.phxCd){H.phxCd=e+90000;H.hp=H.mhp*.4;H.inv=e+1500;fx('pillar',H.x,H.y,{w:50,T:.8,col:'#ff9a4a'});burst(H.x,H.y-24,18,'#ff9a4a',150,.7,4,0,-80);toast('Fênix: você renasceu');return}
     H.hp=0;H.dead=true;H.deaths++;H.target=null;H.respawnAt=e+Math.min(9000,4000+250*H.lv);lastDeath=[++dseq,by||'',H.lv];
@@ -481,7 +481,7 @@ function aoe(x,y,rad,d,ex,flag){
 function each(f){for(const c of G.creeps)if(c.alive&&!c.back)f(c);for(const B of G.bosses)if(B.alive)f(B);for(const o of G.foes)if(!(o.bf&4))f(o)}
 function cone(x,y,a,len,half,d){each(t=>{const dx=t.x-x,dy=t.y-y,dd=Math.hypot(dx,dy);if(dd>len+t.r)return;let da=Math.atan2(dy,dx)-a;da=Math.atan2(Math.sin(da),Math.cos(da));if(Math.abs(da)<=half||dd<34)dealt(t,d)})}
 function lineHit(x,y,a,len,d,ex){const ux=Math.cos(a),uy=Math.sin(a);each(t=>{if(t===ex)return;const dx=t.x-x,dy=t.y-y,al=dx*ux+dy*uy;if(al<0||al>len)return;if(Math.abs(dx*uy-dy*ux)<t.r+12)dealt(t,d)})}
-function outDmg(t,base){const e=now();let d=base*(e<H.fury?2:1)*(e<H.wrath?1.5:1);
+function outDmg(t,base){const e=now();let d=base*(e<H.fury?2:1)*(e<H.wrath?1.3:1);
   if(t&&tr('exec')){const f=t.kind==='hero'?t.hp/t.mh:t.hp/t.mhp;if(f<.35)d*=1.35}return d}
 function inRange(t){return Math.hypot(t.x-H.x,t.y-H.y)-t.r<=H.range}
 function valid(t){if(t.kind==='hero'){if(t.dead||t.gone||t.away||(t.bf&4)||t.mid!==G.mid)return false}else if(!t.alive||t.back)return false;return inRange(t)}
@@ -489,7 +489,7 @@ function pickTarget(){let b=null,bs=1e9;each(t=>{const raw=Math.hypot(t.x-H.x,t.
 function shoot(t,d,crit,w){const k=CLS[H.cls].proj;G.proj.push({x:H.x+Math.cos(H.face)*18,y:H.y-27+Math.sin(H.face)*8,t,tx:t.x,ty:t.y-hgt(t)*.45,gx:t.x,gy:t.y,ga:H.face,d,spd:k===1?720:520,k,mine:true,a:H.face,w:w||0,crit})}
 function attack(t){const C=CLS[H.cls];let d=outDmg(t,H.dmg)*(.9+Math.random()*.2),crit=false;if(Math.random()<.1*tr('crit')+.15*rl('eye')){d*=2;crit=true}
   lastAtk=[++aseq,Math.round(t.x),Math.round(t.y)];H.sw=H.swD=Math.min(.3,H.itv*.55);
-  if(C.proj===0){dealt(t,d,0,crit);fx('slash',t.x,t.y-hgt(t)*.45,{a:H.face,T:.2,col:'#fff3c4'});if(tr('cleave'))aoe(t.x,t.y,64,d*.25*tr('cleave'),t);
+  if(C.proj===0){dealt(t,d,0,crit);fx('slash',t.x,t.y-hgt(t)*.45,{a:H.face,T:.2,col:'#fff3c4'});if(tr('cleave'))aoe(t.x,t.y,64,d*.2*tr('cleave'),t);
     if(rl('blade')){aoe(t.x,t.y,72,d*.4,t);fx('ring',t.x,t.y,{r:72,T:.3,col:'#ffe9a0'})}}
   else{shoot(t,d,crit,0);if(tr('echo')&&Math.random()<.3)shoot(t,d,false,.16)}}
 function mkZone(kind,x,y,mine,d,cap){
@@ -501,8 +501,8 @@ function mkZone(kind,x,y,mine,d,cap){
 /* Executa (ou só encena, para heróis remotos) uma habilidade. k: 0 básica, 1 supremo, 2 supremo com o talento final. */
 function doSkill(o,cls,k,x,y,ang,mine,m,s1m){
   if(cls===0){
-    if(!k){if(mine)aoe(o.x,o.y,140,m*2.4*s1m);fx('ring',o.x,o.y,{r:140,T:.45});fx('cross',o.x,o.y,{r:140,T:.5});burst(o.x,o.y-10,14,'#ffe9a0',220,.5,4);shake(4)}
-    else{if(mine)aoe(o.x,o.y,205,m*6);fx('pillar',o.x,o.y,{w:120,T:1});fx('ring',o.x,o.y,{r:205,T:.6});fx('ring',o.x,o.y,{r:120,T:.9,col:'#fff3c4'});burst(o.x,o.y-30,22,'#fff3c4',260,1,5,3,40);burst(o.x,o.y-20,20,'#ffe9a0',300,.6,4);shake(10)}}
+    if(!k){if(mine)aoe(o.x,o.y,140,m*2*s1m);fx('ring',o.x,o.y,{r:140,T:.45});fx('cross',o.x,o.y,{r:140,T:.5});burst(o.x,o.y-10,14,'#ffe9a0',220,.5,4);shake(4)}
+    else{if(mine)aoe(o.x,o.y,205,m*4.5);fx('pillar',o.x,o.y,{w:120,T:1});fx('ring',o.x,o.y,{r:205,T:.6});fx('ring',o.x,o.y,{r:120,T:.9,col:'#fff3c4'});burst(o.x,o.y-30,22,'#fff3c4',260,1,5,3,40);burst(o.x,o.y-20,20,'#ffe9a0',300,.6,4);shake(10)}}
   else if(cls===1){
     if(!k){if(mine)cone(o.x,o.y,ang,300,.5,m*2.5*s1m);fx('cone',o.x,o.y,{a:ang,r:300,half:.5,T:.3,col:'#bfe6a8'});
       for(let j=-3;j<=3;j++){const a=ang+j*.16;G.proj.push({x:o.x,y:o.y-27,t:null,tx:o.x+Math.cos(a)*300,ty:o.y-22+Math.sin(a)*300,d:0,spd:900,k:1,mine:false,a,w:0})}}
@@ -513,7 +513,7 @@ function cast(i){const e=now();if(G.state!=='play'||!H||H.dead||e<0||(i?H.cd2:H.
   const t=H.target&&valid(H.target)?H.target:null,ang=t?Math.atan2(t.y-H.y,t.x-H.x):H.face;H.face=ang;
   if(i)H.cd2=cdOf(1);else H.cd1=cdOf(0);H.ct=H.ctD=i?.8:.4;H.ck=i;
   const zone=H.cls===2||(H.cls===1&&i),px=zone?(t?t.x:H.x+Math.cos(ang)*180):H.x,py=zone?(t?t.y:H.y+Math.sin(ang)*180):H.y,k=i?(tr('ult')?2:1):0;
-  if(H.cls===0){H.hp=Math.min(H.mhp,H.hp+H.mhp*(i?.35:.12));if(i)H.wrath=e+8000+4000*tr('ult')}
+  if(H.cls===0){H.hp=Math.min(H.mhp,H.hp+H.mhp*(i?.2:.07));if(i)H.wrath=e+6000+3000*tr('ult')}
   doSkill(H,H.cls,k,px,py,ang,true,outDmg(null,H.dmg),1+.2*tr('s1'));
   lastSkill=[++sseq,px|0,py|0,Math.round(ang*100),k];pushPresence();hud()}
 function potion(){if(G.state!=='play'||!H||H.dead||H.pot>0||H.gold<40||H.hp>=H.mhp)return;H.gold-=40;H.pot=12;H.hp=Math.min(H.mhp,H.hp+H.mhp*.45);fx('ring',H.x,H.y,{r:40,col:'#74c365'});burst(H.x,H.y-24,10,'#74c365',70,.7,4,0,-90);hud()}
@@ -616,7 +616,7 @@ function update(dt,t){
     const[ix,iy]=inputVec(),sp=H.spd*(e<H.haste?1.4:1)*(e<H.slow?.6:1),ox=H.x,oy=H.y;
     if(ix||iy){moveC(H,ix*sp*dt,iy*sp*dt,13);if(!H.target)H.face=Math.atan2(iy,ix)}
     const dm=Math.hypot(H.x-ox,H.y-oy);H.walk+=dm*.085;H.mv+=((dm>.2?1:0)-H.mv)*Math.min(1,dt*12);
-    const sd=Math.hypot(H.x-G.spawn.x,H.y-G.spawn.y),rg=(sd<110?.1:e-H.hurtAt>5000?.012:0)+.006*tr('regen');
+    const sd=Math.hypot(H.x-G.spawn.x,H.y-G.spawn.y),rg=(sd<110?.1:e-H.hurtAt>5000?.012:0)+.004*tr('regen');
     if(rg)H.hp=Math.min(H.mhp,H.hp+H.mhp*rg*dt);
     H.atk-=dt;H.cd1-=dt;H.cd2-=dt;H.pot-=dt;H.sel-=dt;
     if(e<H.wrath&&Math.random()<dt*14)part(H.x+(Math.random()-.5)*26,H.y-10-Math.random()*40,0,-50,.6,3.5,'#ffe9a0');
