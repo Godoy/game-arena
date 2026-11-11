@@ -1,6 +1,13 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Arena Celeste Game</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10131f">
+<style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Arena Celeste</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=Grenze+Gotisch:wght@600;800&display=swap">
 <style>
 /* Layout: tela única. O canvas da arena cobre tudo; o HUD fica ancorado nos cantos
@@ -87,6 +94,10 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
 .heroes input:focus-visible+label{outline:2px solid var(--gold);outline-offset:2px}
 #skill-line{margin:0;display:grid;gap:2px;font-size:14px;color:var(--muted)}
 #skill-line b{color:var(--mana)}#skill-line b.u{color:var(--gold)}
+.rc{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rc button{font:700 14px var(--ui);color:var(--parch);background:var(--stone-2);border:1px solid var(--line);border-radius:4px;padding:9px 12px}
+.rc input{font:700 16px var(--ui);letter-spacing:.2em;text-transform:uppercase;flex:1;min-width:0;width:6em;color:var(--parch);background:var(--night);border:1px solid var(--line);border-radius:4px;padding:8px 10px;-webkit-user-select:text;user-select:text}
+#room-code{font:800 22px var(--ui);letter-spacing:.25em;color:var(--gold);flex:1}
 .room{display:grid;gap:6px;padding:10px 12px;background:var(--stone);border:1px solid var(--line);border-radius:4px}
 #room-msg{margin:0;font-size:14px}
 #room-list{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
@@ -199,7 +210,9 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
       </div>
       <div class="room">
         <span class="label">Sala</span>
-        <p id="room-msg">Conectando à sala…</p>
+        <p id="room-msg"></p>
+        <div class="rc" id="room-ctl"><button id="b-host" type="button">Criar sala</button><input id="code" type="text" maxlength="4" placeholder="CÓDIGO" aria-label="Código da sala" autocapitalize="characters" autocomplete="off" spellcheck="false"><button id="b-join" type="button">Entrar</button></div>
+        <div class="rc" id="room-on" hidden><b id="room-code"></b><button id="b-share" type="button">Convidar</button><button id="b-leave" type="button">Sair</button></div>
         <ul id="room-list"></ul>
       </div>
       <button class="go" id="b-go" type="button">Iniciar partida</button>
@@ -240,6 +253,7 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
   </section>
 </div>
 
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 (()=>{'use strict';
 const TILE=48,N=56,WORLD=N*TILE,MID=WORLD/2,WAVE=40000,TAU=6.2832,LVMAX=40,DURS=[5,10,15,20];
@@ -355,7 +369,7 @@ const P={name:'',cls:0,dur:10};
 const G={state:'menu',mid:'',seed:0,off:0,map:null,wave:-1,creeps:[],deadC:new Set(),myCk:[],myCc:[],chests:[],proj:[],fx:[],txt:[],zones:[],parts:[],dying:[],bosses:[],dur:600000,spawn:null,foes:[],heroes:[],stormSaid:false,mini:null,sheet:'',shake:0,vig:null};
 let H=null;
 const others=new Map();
-let room=null,myPeer='',roomState='wait';
+let room=null,myPeer='',roomState='solo';
 let hseq=0,dseq=0,sseq=0,aseq=0,hits=[],lastDeath=null,lastSkill=null,lastAtk=null,bossGl=0;
 const still=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
 const now=()=>G.state==='end'?G.dur:performance.now()+G.off;
@@ -647,10 +661,56 @@ function pack(){
     st:H.dead?1:0,bf:H.bf,h:hits.slice(),dk:lastDeath,ck:[G.wave,...G.myCk],cc:[G.wave,...G.myCc],
     bd:G.bosses.map(B=>[B.life,Math.round(B.my),B.alive?1:0]),sx:lastSkill,a:lastAtk}}
 function pushPresence(){if(!room)return;try{const p=room.presence(pack());if(p&&p.catch)p.catch(()=>{})}catch(_){}}
-function netInit(){const c=window.claude;if(!c||typeof c.use!=='function'){roomState='off';return}
-  c.use('room').then(r=>{if(!r){roomState='off';refreshMenu();return}
-    room=r;roomState='on';try{r.onPeers(()=>{},()=>{room=null;roomState='off'})}catch(_){}
-    pushPresence();refreshMenu()}).catch(()=>{roomState='off';refreshMenu()})}
+/* Rede fora do Claude: WebRTC via PeerJS. Quem cria a sala vira o ponto central e
+   repassa a presença de cada jogador; o código de 4 letras é o endereço da sala. */
+const NET={peer:null,host:null,conns:new Map(),pres:new Map(),dirty:new Set(),gone:[],code:'',isHost:false,my:'',msg:'',iv:0},PFX='arena-celeste-3-';
+function newCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ';let c='';for(let i=0;i<4;i++)c+=A[Math.random()*A.length|0];return c}
+function netShim(){return{
+  presence(v){if(NET.isHost){NET.pres.set(NET.my,{s:v,at:Date.now()});NET.dirty.add(NET.my)}else if(NET.host&&NET.host.open)NET.host.send({t:'p',s:v})},
+  peers(){const a=[{isMe:true,sameTab:true,peer:NET.my,kind:'viewer',presence:null}];NET.pres.forEach((v,id)=>{if(id!==NET.my)a.push({peer:id,kind:'viewer',presence:v.s,updatedAt:v.at})});return a}}}
+function netClose(){const p=NET.peer;NET.peer=null;NET.host=null;clearInterval(NET.iv);NET.conns.clear();NET.pres.clear();NET.dirty.clear();NET.gone=[];NET.my='';NET.code='';room=null;myPeer='';
+  if(p)try{p.destroy()}catch(_){}
+  if(G.state==='menu')others.clear();else others.forEach(o=>{o.gone=true});
+  try{history.replaceState(null,'',location.pathname+location.search)}catch(_){}}
+function netFail(m){netClose();roomState='err';NET.msg=m;refreshMenu()}
+function netLeave(){netClose();roomState='solo';refreshMenu()}
+function netFlush(){if(!NET.dirty.size&&!NET.gone.length)return;const x=NET.gone;NET.gone=[];
+  NET.conns.forEach((c,cid)=>{if(!c.open)return;const m={};NET.dirty.forEach(id=>{if(id!==cid){const v=NET.pres.get(id);if(v)m[id]=v.s}});try{c.send({t:'m',m,x})}catch(_){}});NET.dirty.clear()}
+function netData(d){if(!d||d.t!=='m')return;
+  if(d.m&&typeof d.m==='object')for(const id in d.m){if(id!==NET.my&&d.m[id]&&typeof d.m[id]==='object')NET.pres.set(id,{s:d.m[id],at:Date.now()})}
+  if(Array.isArray(d.x))for(const id of d.x)NET.pres.delete(id)}
+function netOpen(code,host){netClose();
+  if(typeof Peer!=='function')return netFail('O módulo de rede não carregou. Confira a internet e recarregue a página.');
+  roomState='wait';NET.code=code;NET.isHost=host;refreshMenu();
+  let p;try{p=NET.peer=host?new Peer(PFX+code):new Peer()}catch(_){return netFail('Este navegador não permite a conexão entre aparelhos.')}
+  const live=()=>NET.peer===p;
+  setTimeout(()=>{if(live()&&roomState==='wait')netFail('A conexão demorou demais. Tente de novo.')},20000);
+  p.on('open',id=>{if(!live())return;NET.my=id;
+    if(host){room=netShim();roomState='on';NET.iv=setInterval(netFlush,100);try{history.replaceState(null,'','#'+code)}catch(_){}pushPresence();refreshMenu();return}
+    const c=NET.host=p.connect(PFX+code,{reliable:true});
+    c.on('open',()=>{if(!live())return;room=netShim();roomState='on';try{history.replaceState(null,'','#'+code)}catch(_){}pushPresence();refreshMenu()});
+    c.on('data',d=>{if(live())netData(d)});
+    c.on('close',()=>{if(live())netFail('A sala fechou: quem criou saiu ou a conexão caiu.')})});
+  p.on('connection',c=>{if(!live()||!host||NET.conns.size>=9){try{c.close()}catch(_){}return}
+    c.on('open',()=>{if(!live())return;NET.conns.set(c.peer,c);const m={};NET.pres.forEach((v,id)=>{m[id]=v.s});try{c.send({t:'m',m})}catch(_){}});
+    c.on('data',d=>{if(live()&&d&&d.t==='p'&&d.s&&typeof d.s==='object'){NET.pres.set(c.peer,{s:d.s,at:Date.now()});NET.dirty.add(c.peer)}});
+    const bye=()=>{if(NET.conns.get(c.peer)!==c)return;NET.conns.delete(c.peer);NET.pres.delete(c.peer);NET.dirty.delete(c.peer);NET.gone.push(c.peer)};
+    c.on('close',bye);c.on('error',bye)});
+  p.on('error',e=>{if(!live())return;const t=e&&e.type;
+    if(t==='unavailable-id'&&host)return netOpen(newCode(),true);
+    if(t==='peer-unavailable')return netFail('Sala '+code+' não encontrada. Confira o código com quem criou.');
+    if(roomState!=='on')netFail('Não foi possível conectar. Confira a internet e tente de novo.')});
+  p.on('disconnected',()=>{if(live()&&!p.destroyed)setTimeout(()=>{if(live()&&!p.destroyed)try{p.reconnect()}catch(_){}},1500)})}
+function netInvite(){const url=location.origin+location.pathname+'#'+NET.code,msg=$('b-share'),done=t=>{msg.textContent=t;setTimeout(()=>{msg.textContent='Convidar'},1800)};
+  if(navigator.share)navigator.share({title:'Arena Celeste',text:'Entra na minha sala da Arena Celeste: '+NET.code,url}).catch(()=>{});
+  else if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(()=>done('Link copiado'),()=>done(NET.code));
+  else done(NET.code)}
+function netInit(){
+  $('b-host').addEventListener('click',()=>netOpen(newCode(),true));
+  const inp=$('code'),join=()=>{const c=inp.value.toUpperCase().replace(/[^A-Z]/g,'');if(c.length===4)netOpen(c,false);else{roomState='err';NET.msg='O código da sala tem 4 letras.';refreshMenu()}};
+  $('b-join').addEventListener('click',join);inp.addEventListener('keydown',e=>{if(e.key==='Enter')join()});
+  $('b-leave').addEventListener('click',netLeave);$('b-share').addEventListener('click',netInvite);
+  const h=(location.hash||'').slice(1).toUpperCase();if(/^[A-Z]{4}$/.test(h)){inp.value=h;netOpen(h,false)}}
 function netRead(){
   if(!room)return;let ps;try{ps=room.peers()}catch(_){return}
   others.forEach(o=>{o.gone=true});let adopt=null;const e=now();
@@ -1078,10 +1138,12 @@ function renderEnd(){const l=board(),tb=$('rank').tBodies[0];tb.textContent='';
     const n=td(r.name+' ');const sm=document.createElement('small');sm.textContent=CLS[r.cls].n+', nv. '+r.lv+(r.gone?', saiu':'');n.appendChild(sm);td(r.sc);td(r.k);td(r.mk);tb.appendChild(tr2)})}
 function refreshMenu(){
   if(G.state!=='menu')return;const msg=$('room-msg'),ul=$('room-list'),go=$('b-go');ul.textContent='';
-  if(roomState==='wait')msg.textContent='Conectando à sala…';
-  else if(roomState==='off')msg.textContent='Sem conexão com a sala nesta visualização. Dá para jogar sozinho.';
+  $('room-ctl').hidden=roomState==='on'||roomState==='wait';$('room-on').hidden=roomState!=='on';$('room-code').textContent=NET.code;
+  if(roomState==='wait')msg.textContent=NET.isHost?'Criando a sala…':'Entrando na sala '+NET.code+'…';
+  else if(roomState==='err')msg.textContent=NET.msg;
+  else if(roomState==='solo')msg.textContent='Para jogar com amigos, crie uma sala e passe o código, ou entre com o código de alguém. Sem sala, você joga sozinho.';
   else{const list=[];others.forEach(o=>{if(!o.gone)list.push(o)});
-    msg.textContent=list.length?'Quem está com esta página aberta agora:':'Só você por enquanto. Quem abrir esta página entra na mesma sala.';
+    msg.textContent=list.length?'Na sala agora:':'Sala aberta, só você por enquanto. Toque em Convidar para mandar o link.';
     const add=(s,you)=>{const li=document.createElement('li');li.textContent=s;if(you)li.className='you';ul.appendChild(li)};
     if(list.length){add(P.name+' (você)',true);list.forEach(o=>add(o.name+(o.mid&&Date.now()-o.at<4000&&o.e<o.dur?' · em partida':'')))}}
   const j=joinable();go.textContent=j?'Entrar na partida de '+j.o.name+' · '+fmt(j.o.dur-Math.max(0,j.est)):'Iniciar partida'}
@@ -1114,12 +1176,11 @@ function start(data){
   cv.addEventListener('pointermove',e=>{if(e.pointerId===stick.id){stick.x=e.clientX;stick.y=e.clientY}});
   const up=e=>{if(e.pointerId===stick.id)stick.id=null};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
   cv.addEventListener('contextmenu',e=>e.preventDefault());
-  addEventListener('keydown',e=>{if(e.target===nick)return;keys.add(e.code);if(G.state==='play'){if(e.code==='Space'){e.preventDefault();cast(0)}else if(e.code==='KeyE'||e.code==='KeyR')cast(1);else if(e.code==='KeyQ')potion();else if(e.code==='KeyT')sheet(G.sheet==='tal'?'':'tal');else if(e.code==='KeyB')sheet(G.sheet==='shop'?'':'shop')}});
+  addEventListener('keydown',e=>{if(e.target&&e.target.tagName==='INPUT')return;keys.add(e.code);if(G.state==='play'){if(e.code==='Space'){e.preventDefault();cast(0)}else if(e.code==='KeyE'||e.code==='KeyR')cast(1);else if(e.code==='KeyQ')potion();else if(e.code==='KeyT')sheet(G.sheet==='tal'?'':'tal');else if(e.code==='KeyB')sheet(G.sheet==='shop'?'':'shop')}});
   addEventListener('keyup',e=>keys.delete(e.code));addEventListener('blur',()=>{keys.clear();stick.id=null});
   netInit();refreshMenu();
   setInterval(()=>{if(G.state==='play')pushPresence()},90);
   setInterval(()=>{hud();refreshMenu()},140);
-  setTimeout(()=>{if(roomState==='wait'){roomState='off';refreshMenu()}},11000);
   let last=performance.now(),fr=0;
   const frame=t=>{const dt=Math.min(.05,Math.max(.001,(t-last)/1000));last=t;netRead();
     if(G.state==='play')update(dt,t);
@@ -1133,4 +1194,5 @@ if(hot&&hot.ready)hot.ready(start);else start((hot&&hot.data)||{});
 })();
 </script>
 
-</body></html>
+</body>
+</html>
