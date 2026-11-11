@@ -98,6 +98,15 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
 .rc button{font:700 14px var(--ui);color:var(--parch);background:var(--stone-2);border:1px solid var(--line);border-radius:4px;padding:9px 12px}
 .rc input{font:700 16px var(--ui);letter-spacing:.2em;text-transform:uppercase;flex:1;min-width:0;width:6em;color:var(--parch);background:var(--night);border:1px solid var(--line);border-radius:4px;padding:8px 10px;-webkit-user-select:text;user-select:text}
 #room-code{font:800 22px var(--ui);letter-spacing:.25em;color:var(--gold);flex:1}
+.note{margin:-8px 0 0;font-size:13px;color:var(--muted);text-align:center}.note:empty,#room-err:empty{display:none}
+.friends{display:grid;gap:8px;padding-top:14px;border-top:1px solid var(--line)}
+.alt{width:100%;padding:12px 16px;font:800 15px var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--gold);background:transparent;border:1px solid var(--gold);border-radius:4px}
+.link{justify-self:start;padding:6px 0;font:700 13px var(--ui);color:var(--muted);background:none;border:0;text-decoration:underline}
+#room-err{margin:0;font-size:14px;color:var(--blood)}
+.go:disabled{opacity:.5}
+.ghost.danger{color:var(--blood);border-color:var(--blood)}
+.mid{display:grid;gap:6px;justify-items:center}
+.exit{pointer-events:auto;font:700 12px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--parch);background:rgba(16,19,31,.78);border:1px solid var(--line);border-radius:6px;padding:8px 16px}
 .room{display:grid;gap:6px;padding:10px 12px;background:var(--stone);border:1px solid var(--line);border-radius:4px}
 #room-msg{margin:0;font-size:14px}
 #room-list{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
@@ -169,7 +178,7 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
         <div class="me-row small"><span class="gold" id="h-gold">0 ouro</span><span id="h-kd">0 abates</span></div>
         <div id="h-rel"></div>
       </div>
-      <div class="clock"><b id="h-clock">10:00</b><span id="h-wave">Onda 1</span></div>
+      <div class="mid"><div class="clock"><b id="h-clock">10:00</b><span id="h-wave">Onda 1</span></div><button class="exit" id="b-menu" type="button">Sair</button></div>
       <div class="side"><canvas id="mini" width="168" height="168" aria-label="Minimapa"></canvas><ol id="h-board"></ol></div>
     </div>
     <div id="toasts" aria-live="polite"></div>
@@ -199,7 +208,13 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
         </div>
         <p id="skill-line"></p>
       </div>
-      <div class="field">
+      <div class="room" id="room-on" hidden>
+        <div class="rc"><span class="label">Sala</span><b id="room-code"></b><button id="b-share" type="button">Convidar</button></div>
+        <p id="room-msg"></p>
+        <ul id="room-list"></ul>
+        <button class="link" id="b-leave" type="button">Sair da sala</button>
+      </div>
+      <div class="field" id="f-dur">
         <span class="label" id="l-dur">Duração da partida</span>
         <div class="durs" role="radiogroup" aria-labelledby="l-dur">
           <input type="radio" name="dur" id="dur5" value="5"><label for="dur5">5 min</label>
@@ -208,14 +223,14 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
           <input type="radio" name="dur" id="dur20" value="20"><label for="dur20">20 min</label>
         </div>
       </div>
-      <div class="room">
-        <span class="label">Sala</span>
-        <p id="room-msg"></p>
-        <div class="rc" id="room-ctl"><button id="b-host" type="button">Criar sala</button><input id="code" type="text" maxlength="4" placeholder="CÓDIGO" aria-label="Código da sala" autocapitalize="characters" autocomplete="off" spellcheck="false"><button id="b-join" type="button">Entrar</button></div>
-        <div class="rc" id="room-on" hidden><b id="room-code"></b><button id="b-share" type="button">Convidar</button><button id="b-leave" type="button">Sair</button></div>
-        <ul id="room-list"></ul>
+      <button class="go" id="b-go" type="button">Jogar sozinho</button>
+      <p class="note" id="go-note"></p>
+      <div class="friends" id="room-ctl">
+        <span class="label">Ou jogue com amigos</span>
+        <button class="alt" id="b-host" type="button">Criar sala</button>
+        <div class="rc"><input id="code" type="text" maxlength="4" placeholder="CÓDIGO" aria-label="Código da sala" autocapitalize="characters" autocomplete="off" spellcheck="false"><button id="b-join" type="button">Entrar na sala</button></div>
+        <p id="room-err" role="alert"></p>
       </div>
-      <button class="go" id="b-go" type="button">Iniciar partida</button>
       <ul class="how">
         <li><b>Mover:</b> toque e arraste em qualquer ponto da tela. O herói ataca sozinho o inimigo mais próximo.</li>
         <li><b>Crescer:</b> criaturas e baús dão ouro e experiência. Cada nível rende um ponto de talento. A cada 40 s tudo renasce mais forte.</li>
@@ -230,7 +245,7 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
       <div class="shop-head"><h2 id="t-shop">Loja</h2><span class="gold" id="s-gold"></span></div>
       <div id="s-items"></div>
       <p id="s-rel" class="rel-list"></p>
-      <div class="shop-foot"><button class="ghost" id="b-quit" type="button">Abandonar partida</button><button class="ghost" id="b-close" type="button">Fechar</button></div>
+      <div class="shop-foot"><span></span><button class="ghost" id="b-close" type="button">Fechar</button></div>
     </div>
   </section>
 
@@ -240,6 +255,14 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
       <div class="tree" id="t-tree"></div>
       <div class="attr"><span class="label" id="t-amsg"></span><div class="attr-row" id="t-attr"></div></div>
       <div class="shop-foot"><span class="label">1 ponto por nível</span><button class="ghost" id="b-tclose" type="button">Fechar</button></div>
+    </div>
+  </section>
+
+  <section id="quit" class="sheet card" hidden aria-labelledby="t-quit">
+    <div class="inner">
+      <h2 id="t-quit">Sair da partida?</h2>
+      <p class="lede" id="q-msg"></p>
+      <div class="shop-foot"><button class="ghost danger" id="b-quit" type="button">Abandonar partida</button><button class="ghost" id="b-qclose" type="button">Continuar jogando</button></div>
     </div>
   </section>
 
@@ -408,7 +431,7 @@ function startMatch(mid,seed,e0,du){
   setState('play');pushPresence();
   try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(_){}
 }
-function sheet(s){G.sheet=s;$('shop').hidden=s!=='shop';$('tal').hidden=s!=='tal';if(s==='shop')renderShop();if(s==='tal')renderTal()}
+function sheet(s){G.sheet=s;$('shop').hidden=s!=='shop';$('tal').hidden=s!=='tal';$('quit').hidden=s!=='quit';if(s==='quit'){let n=0;others.forEach(o=>{if(!o.gone&&o.mid===G.mid)n++});$('q-msg').textContent=(n?'A partida continua para os outros jogadores. ':'')+'Você volta ao menu inicial e perde o progresso desta partida. O jogo não pausa enquanto esta janela está aberta.'}if(s==='shop')renderShop();if(s==='tal')renderTal()}
 function setState(s){G.state=s;$('menu').hidden=s!=='menu';$('hud').hidden=s!=='play';$('end').hidden=s!=='end';sheet('');stick.id=null}
 function kindFor(c,w){const st=Math.round(NEWAT[c.tier]*Math.max(6,G.dur/WAVE));if(w<st)return c.tier;return(Math.imul(c.id+1,2654435761)>>>0)%100<(w>=st+4?75:50)?c.tier+4:c.tier}
 function setWave(w){G.wave=w;G.deadC.clear();G.myCk=[];G.myCc=[];const news=[],nW=Math.max(6,G.dur/WAVE);
@@ -1137,16 +1160,21 @@ function renderEnd(){const l=board(),tb=$('rank').tBodies[0];tb.textContent='';
     const td=s=>{const c=document.createElement('td');c.textContent=s;tr2.appendChild(c);return c};td(i+1);
     const n=td(r.name+' ');const sm=document.createElement('small');sm.textContent=CLS[r.cls].n+', nv. '+r.lv+(r.gone?', saiu':'');n.appendChild(sm);td(r.sc);td(r.k);td(r.mk);tb.appendChild(tr2)})}
 function refreshMenu(){
-  if(G.state!=='menu')return;const msg=$('room-msg'),ul=$('room-list'),go=$('b-go');ul.textContent='';
-  $('room-ctl').hidden=roomState==='on'||roomState==='wait';$('room-on').hidden=roomState!=='on';$('room-code').textContent=NET.code;
-  if(roomState==='wait')msg.textContent='Conectando à sala '+NET.code+'…';
-  else if(roomState==='err')msg.textContent=NET.msg;
-  else if(roomState==='solo')msg.textContent='Para jogar com amigos, crie uma sala e passe o código, ou entre com o código de alguém. Sem sala, você joga sozinho.';
-  else{const list=[];others.forEach(o=>{if(!o.gone)list.push(o)});
-    msg.textContent=!netUp()?'Sem conexão no momento, tentando reconectar…':list.length?'Na sala agora:':'Só você na sala por enquanto. Toque em Convidar para mandar o link.';
-    const add=(s,you)=>{const li=document.createElement('li');li.textContent=s;if(you)li.className='you';ul.appendChild(li)};
+  if(G.state!=='menu')return;const msg=$('room-msg'),ul=$('room-list'),go=$('b-go'),note=$('go-note'),on=roomState==='on',wait=roomState==='wait';
+  const j=on?joinable():null;
+  if(j&&j.est<5000&&j.o.mid!==G.skip){const nm=j.o.name;startMatch(j.o.mid,j.o.seed,j.o.e+(Date.now()-j.o.at),j.o.du);toast(nm+' iniciou a partida');return}
+  $('room-on').hidden=!(on||wait);$('room-ctl').hidden=on||wait;$('room-code').textContent=NET.code;$('b-share').hidden=!on;$('b-leave').textContent=wait?'Cancelar':'Sair da sala';
+  $('room-err').textContent=roomState==='err'?NET.msg:'';
+  ul.textContent='';const list=[];if(on)others.forEach(o=>{if(!o.gone)list.push(o)});
+  if(wait)msg.textContent='Conectando…';
+  else if(on){msg.textContent=!netUp()?'Sem conexão no momento, tentando reconectar…':list.length?'Na sala agora:':'Só você por enquanto. Toque em Convidar ou passe o código para seus amigos.';
+    const add=(t,you)=>{const li=document.createElement('li');li.textContent=t;if(you)li.className='you';ul.appendChild(li)};
     if(list.length){add(P.name+' (você)',true);list.forEach(o=>add(o.name+(o.mid&&Date.now()-o.at<4000&&o.e<o.dur?' · em partida':'')))}}
-  const j=joinable();go.textContent=j?'Entrar na partida de '+j.o.name+' · '+fmt(j.o.dur-Math.max(0,j.est)):'Iniciar partida'}
+  $('f-dur').hidden=!!j;go.disabled=wait;
+  if(j){go.textContent='Entrar na partida · '+fmt(j.o.dur-Math.max(0,j.est));note.textContent='Partida de '+j.o.name+' em andamento. Você começa no nível 1.'}
+  else if(on){go.textContent=list.length?'Iniciar partida para todos':'Iniciar partida';
+    note.textContent=list.length?'A partida começa ao mesmo tempo para os '+(list.length+1)+' jogadores da sala.':'Dá para começar agora: quem chegar na sala depois pode entrar na partida.'}
+  else{go.textContent='Jogar sozinho';note.textContent=''}}
 function selectHero(i){P.cls=i;$('hero'+i).checked=true;const C=CLS[i],p=$('skill-line');p.textContent='';
   for(const[s,u]of[[C.s1,0],[C.s2,1]]){const row=document.createElement('span'),b=document.createElement('b');if(u)b.className='u';b.textContent=s.n+' ('+s.cd+' s): ';row.append(u?'Supremo ':'Habilidade ',b,s.d);p.appendChild(row)}
   save();pushPresence()}
@@ -1165,18 +1193,18 @@ function start(data){
   for(const d of DURS)$('dur'+d).addEventListener('change',()=>{P.dur=d;save()});$('dur'+P.dur).checked=true;
   $('b-go').addEventListener('click',()=>{const j=joinable();if(j)startMatch(j.o.mid,j.o.seed,j.o.e+(Date.now()-j.o.at),j.o.du);
     else startMatch(Math.random().toString(36).slice(2,8),(Math.random()*2**31)>>>0,-4000,P.dur)});
-  const leave=()=>{G.mid='';setState('menu');pushPresence();refreshMenu()};
+  const leave=()=>{G.skip=G.mid;G.mid='';setState('menu');pushPresence();refreshMenu()};
   $('b-again').addEventListener('click',leave);$('b-quit').addEventListener('click',leave);
   $('b-skill').addEventListener('pointerdown',e=>{e.preventDefault();cast(0)});
   $('b-ult').addEventListener('pointerdown',e=>{e.preventDefault();cast(1)});
   $('b-pot').addEventListener('pointerdown',e=>{e.preventDefault();potion()});
   $('b-shop').addEventListener('click',()=>sheet('shop'));$('b-tal').addEventListener('click',()=>sheet('tal'));
-  $('b-close').addEventListener('click',()=>sheet(''));$('b-tclose').addEventListener('click',()=>sheet(''));
+  $('b-close').addEventListener('click',()=>sheet(''));$('b-qclose').addEventListener('click',()=>sheet(''));$('b-menu').addEventListener('click',()=>sheet(G.sheet==='quit'?'':'quit'));$('b-tclose').addEventListener('click',()=>sheet(''));
   cv.addEventListener('pointerdown',e=>{if(G.state!=='play')return;e.preventDefault();if(stick.id===null){stick.id=e.pointerId;stick.ox=stick.x=e.clientX;stick.oy=stick.y=e.clientY;try{cv.setPointerCapture(e.pointerId)}catch(_){}}});
   cv.addEventListener('pointermove',e=>{if(e.pointerId===stick.id){stick.x=e.clientX;stick.y=e.clientY}});
   const up=e=>{if(e.pointerId===stick.id)stick.id=null};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
   cv.addEventListener('contextmenu',e=>e.preventDefault());
-  addEventListener('keydown',e=>{if(e.target&&e.target.tagName==='INPUT')return;keys.add(e.code);if(G.state==='play'){if(e.code==='Space'){e.preventDefault();cast(0)}else if(e.code==='KeyE'||e.code==='KeyR')cast(1);else if(e.code==='KeyQ')potion();else if(e.code==='KeyT')sheet(G.sheet==='tal'?'':'tal');else if(e.code==='KeyB')sheet(G.sheet==='shop'?'':'shop')}});
+  addEventListener('keydown',e=>{if(e.target&&e.target.tagName==='INPUT')return;keys.add(e.code);if(G.state==='play'){if(e.code==='Space'){e.preventDefault();cast(0)}else if(e.code==='KeyE'||e.code==='KeyR')cast(1);else if(e.code==='KeyQ')potion();else if(e.code==='KeyT')sheet(G.sheet==='tal'?'':'tal');else if(e.code==='Escape')sheet(G.sheet?'':'quit');else if(e.code==='KeyB')sheet(G.sheet==='shop'?'':'shop')}});
   addEventListener('keyup',e=>keys.delete(e.code));addEventListener('blur',()=>{keys.clear();stick.id=null});
   netInit();refreshMenu();
   setInterval(()=>{if(G.state==='play')pushPresence()},110);
