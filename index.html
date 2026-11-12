@@ -188,43 +188,50 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
 #rank tr.you td{color:var(--gold);font-weight:700}
 #rank small{color:var(--muted);font-weight:500}
 @media (prefers-reduced-motion:no-preference){.go,.pad button{transition:filter .12s,background .12s,box-shadow .2s}}
-/* ---------- acabamento: painéis, botões e menus com volume ---------- */
-.me,.clock,#h-board,.exit,#toasts div,#chat-feed div{background:linear-gradient(180deg,rgba(38,46,74,.94),rgba(13,16,28,.94));border-color:#4a5580;box-shadow:0 2px 0 rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)}
-.me,.clock{border-top:2px solid var(--gold);border-radius:9px}
-.clock b{text-shadow:0 0 14px rgba(226,178,76,.45),0 2px 0 rgba(0,0,0,.6)}
-.bar{height:15px;border-radius:8px;border-color:#080a14;background:#080a14;box-shadow:inset 0 1px 3px rgba(0,0,0,.9)}
-.bar i{background:linear-gradient(180deg,#a8e692,#52a84c 55%,#37823a);border-radius:7px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
-.bar.xp{border-radius:4px}.bar.xp i{background:linear-gradient(90deg,#3aa3c7,#9aeaf7);border-radius:3px}
-.lv{background:linear-gradient(180deg,#f7d98a,#c8922e);border-radius:5px;box-shadow:0 1px 0 rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.5)}
-#mini{border:0;box-shadow:0 0 0 2px #080a14,0 0 0 4px var(--gold),0 0 0 5px #080a14,0 5px 12px rgba(0,0,0,.55)}
-#h-board{border-radius:8px}.exit{border-radius:8px}
-.pad button{background:radial-gradient(circle at 50% 28%,#414d7a,#181e33 72%);border-color:#5b6898;box-shadow:0 3px 0 rgba(0,0,0,.55),0 6px 12px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.16);text-shadow:0 1px 0 rgba(0,0,0,.75);transition:transform .06s}
-.pad button:active{transform:scale(.93)}
-.pad button:disabled{filter:saturate(.55) brightness(.82)}
-#b-skill{background:radial-gradient(circle at 50% 28%,#34819a,#102636 74%);box-shadow:0 3px 0 rgba(0,0,0,.55),0 0 0 4px rgba(99,199,214,.16),0 8px 16px rgba(0,0,0,.4),inset 0 2px 0 rgba(255,255,255,.22)}
-#b-ult{background:radial-gradient(circle at 50% 28%,#9a7626,#2a1e08 74%);box-shadow:0 3px 0 rgba(0,0,0,.55),0 0 0 4px rgba(226,178,76,.16),0 8px 16px rgba(0,0,0,.4),inset 0 2px 0 rgba(255,255,255,.22)}
-#b-ult.ready{box-shadow:0 0 0 2px var(--gold),0 0 24px rgba(226,178,76,.9),inset 0 2px 0 rgba(255,255,255,.3);animation:ultp 1.4s ease-in-out infinite}
-@keyframes ultp{50%{box-shadow:0 0 0 2px var(--gold),0 0 10px rgba(226,178,76,.5),inset 0 2px 0 rgba(255,255,255,.3)}}
-@media (prefers-reduced-motion:reduce){#b-ult.ready{animation:none}.pad button,.heroes label{transition:none}}
-h1{text-shadow:0 0 30px rgba(226,178,76,.38),0 3px 0 rgba(0,0,0,.55)}
-h2{text-shadow:0 2px 0 rgba(0,0,0,.5)}
-.heroes label{background:linear-gradient(180deg,#2b3454,#151a2c);border-radius:9px;box-shadow:0 2px 0 rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.07);transition:transform .12s,box-shadow .12s}
-.heroes input:checked+label{background:radial-gradient(circle at 50% 30%,#55491f,#1d2136 72%);box-shadow:0 0 0 1px var(--gold),0 0 20px rgba(226,178,76,.38),inset 0 1px 0 rgba(255,255,255,.12);transform:translateY(-2px)}
+/* ---------- acabamento: discreto, superfícies planas e cantos um pouco mais suaves ---------- */
+.me,.clock,#h-board,.exit{background:rgba(18,22,36,.86);border-radius:8px}
+.bar{border-radius:7px;background:#0b0d18;border-color:#0b0d18}
+.bar i{background:linear-gradient(180deg,#8fd47c,#4c9f47);border-radius:6px}
+.bar.xp{border-radius:3px}.bar.xp i{background:var(--mana)}
+.lv{border-radius:5px}
+#mini{border:2px solid var(--gold)}
+.pad button{background:rgba(22,27,44,.9);transition:transform .06s}
+.pad button:active{transform:scale(.95)}
+#b-skill{background:rgba(16,40,54,.92)}#b-ult{background:rgba(48,37,13,.92)}
+@media (prefers-reduced-motion:reduce){.pad button{transition:none}}
+.heroes label{border-radius:8px}
+.heroes input:checked+label{box-shadow:inset 0 0 0 1px var(--gold)}
 .heroes input:checked+label b{color:var(--gold)}
-.durs label{background:linear-gradient(180deg,#262e4b,#151a2c);border-radius:7px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
-.durs input:checked+label{background:linear-gradient(180deg,#4d4220,#231f31);box-shadow:0 0 0 1px var(--gold),0 0 12px rgba(226,178,76,.25)}
-.go{background:linear-gradient(180deg,#f9de94,#e2b24c 46%,#b98524);border-radius:9px;box-shadow:0 4px 0 #6b4a10,0 9px 18px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.6);text-shadow:0 1px 0 rgba(255,255,255,.35)}
-.go:active{transform:translateY(2px);box-shadow:0 2px 0 #6b4a10,inset 0 1px 0 rgba(255,255,255,.6)}
-.alt{border-radius:9px;background:rgba(226,178,76,.07)}
-.card .inner{background:linear-gradient(180deg,#252c48,#131726);border-color:#4a5580;border-top:2px solid var(--gold);border-radius:14px;box-shadow:0 -10px 30px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06)}
-.node{background:linear-gradient(180deg,#1c2238,#0f121d);border-radius:8px}
-.node.can{background:linear-gradient(180deg,#423c22,#1e2237);box-shadow:0 0 12px rgba(226,178,76,.25)}
-.node.max{background:linear-gradient(180deg,#1f3a2a,#101a18)}
-.item button,.rc button,.ghost,#nick,.rc input{border-radius:7px}
-.item button{background:linear-gradient(180deg,#f5d27a,#c8922e);box-shadow:0 2px 0 #6b4a10}
-.item button:disabled{background:var(--stone-2);box-shadow:none}
-.room{border-radius:10px;background:linear-gradient(180deg,#232a45,#151a2c);border-top:2px solid var(--gold)}
-.evo-row button,.attr-row button{border-radius:8px}
+.durs label,.go,.alt,.room,#nick,.rc input,.rc button,.ghost,.item button,.node,.evo-row button,.attr-row button{border-radius:6px}
+.card .inner{border-radius:12px}
+/* opções da partida recolhidas */
+.opts{border:1px solid var(--line);border-radius:6px;background:var(--stone)}
+.opts summary{list-style:none;display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer}
+.opts summary::-webkit-details-marker{display:none}
+.opts summary div{flex:1;min-width:0;display:grid;gap:2px}
+.opts summary b{font-size:15px;line-height:1.3}
+.opts summary i{flex:none;font-style:normal;font-weight:700;font-size:13px;color:var(--gold)}
+.opts summary i::after{content:"Alterar"}.opts[open] summary i::after{content:"Fechar"}
+.opts[open] summary{border-bottom:1px solid var(--line)}
+.opts .body{display:grid;gap:14px;padding:12px}
+.opts .durs label{background:var(--night)}.opts .durs input:checked+label{background:var(--stone-2)}
+/* talentos: tudo em uma tela */
+#tal .inner{gap:8px;padding:12px;margin-bottom:8px}
+#tal h2{font-size:24px}
+#tal .shop-head{align-items:center}#tal .shop-head .gold{flex:1;text-align:right;font-size:14px}
+#tal .ghost{padding:7px 12px}
+#tal .evo{margin:0;gap:5px}#tal .label{font-size:11.5px;letter-spacing:.06em}
+#tal .evo-row button{padding:6px}#tal .evo-row b{font-size:13px}#tal .evo-row span{font-size:11.5px;line-height:1.2}
+#tal .tree{gap:6px}
+#tal .branch{gap:7px}
+#tal .branch h3{font-size:12px}
+#tal .node{min-height:0;padding:5px 4px 6px;gap:1px}
+#tal .node+.node::before{top:-8px;height:7px}
+#tal .node b{font-size:12.5px;line-height:1.15}
+#tal .node i{font-size:10.5px;line-height:1.1}
+#tal .node span{font-size:11px;line-height:1.18}
+#tal .attr{display:grid;gap:5px}
+#tal .attr-row{gap:6px}#tal .attr-row button{padding:5px 4px;gap:0}#tal .attr-row b{font-size:12.5px}#tal .attr-row span{font-size:11px}
 </style>
 
 <canvas id="cv"></canvas>
@@ -292,6 +299,9 @@ h2{text-shadow:0 2px 0 rgba(0,0,0,.5)}
         </div>
         <button class="link" id="b-leave" type="button">Sair da sala</button>
       </div>
+      <details class="opts" id="opts">
+        <summary><div><span class="label">Partida</span><b id="opts-sum"></b></div><i></i></summary>
+        <div class="body">
       <div class="field" id="f-dur">
         <span class="label" id="l-dur">Duração da partida</span>
         <div class="durs" role="radiogroup" aria-labelledby="l-dur">
@@ -325,13 +335,8 @@ h2{text-shadow:0 2px 0 rgba(0,0,0,.5)}
         </div>
         <p class="note left" id="mode-note"></p>
       </div>
-      <div class="field" id="f-gfx">
-        <span class="label" id="l-gfx">Gráficos</span>
-        <div class="durs two" role="radiogroup" aria-labelledby="l-gfx">
-          <input type="radio" name="gfx" id="gfx1" value="1"><label for="gfx1">Completo</label>
-          <input type="radio" name="gfx" id="gfx0" value="0"><label for="gfx0">Leve</label>
         </div>
-      </div>
+      </details>
       <button class="go" id="b-go" type="button">Jogar sozinho</button>
       <p class="note" id="go-note"></p>
       <div class="friends" id="room-ctl">
@@ -363,11 +368,10 @@ h2{text-shadow:0 2px 0 rgba(0,0,0,.5)}
 
   <section id="tal" class="sheet card" hidden aria-labelledby="t-tal">
     <div class="inner">
-      <div class="shop-head"><h2 id="t-tal">Talentos</h2><span class="gold" id="t-pts"></span></div>
+      <div class="shop-head"><h2 id="t-tal">Talentos</h2><span class="gold" id="t-pts"></span><button class="ghost" id="b-tclose" type="button">Fechar</button></div>
       <div class="evo"><span class="label" id="t-emsg"></span><div class="evo-row" id="t-erow"></div></div>
       <div class="tree" id="t-tree"></div>
       <div class="attr"><span class="label" id="t-amsg"></span><div class="attr-row" id="t-attr"></div></div>
-      <div class="shop-foot"><span class="label">1 ponto por nível</span><button class="ghost" id="b-tclose" type="button">Fechar</button></div>
     </div>
   </section>
 
@@ -855,18 +859,18 @@ function pickEvo(i){if(!H||H.lv<5||H.evo)return;H.evo=i+1;toast('Evolução: '+E
 function renderTal(){if(!H)return;const box=$('t-tree'),tree=TAL[H.cls];
   {const er=$('t-erow'),E=EVO[H.cls];if(!er.children.length)E.forEach((v,i)=>{const b=document.createElement('button');b.type='button';b.append(document.createElement('b'),document.createElement('span'));b.children[0].textContent=v.n;b.children[1].textContent=v.d;b.addEventListener('click',()=>pickEvo(i));er.appendChild(b)});
     $('t-emsg').textContent=H.evo?'Evolução escolhida: '+E[H.evo-1].n:H.lv<5?'Evolução de '+CLS[H.cls].s1.n+': liberada no nível 5':'Escolha a evolução de '+CLS[H.cls].s1.n+' (não dá para trocar depois)';
-    E.forEach((v,i)=>{const b=er.children[i];b.disabled=H.lv<5||!!H.evo;b.className=H.evo===i+1?'max':''})}
+    er.hidden=H.lv<5||!!H.evo;E.forEach((v,i)=>{const b=er.children[i];b.disabled=H.lv<5||!!H.evo;b.className=H.evo===i+1?'max':''})}
   if(!box.children.length)tree.forEach((br,bi)=>{const col=document.createElement('div');col.className='branch';const h=document.createElement('h3');h.textContent=br.b;col.appendChild(h);
     br.n.forEach((nd,ni)=>{const b=document.createElement('button');b.type='button';b.className='node';b.id='tn-'+bi+'-'+ni;b.append(document.createElement('b'),document.createElement('i'),document.createElement('span'));
       b.addEventListener('click',()=>learn(bi,ni));col.appendChild(b)});box.appendChild(col)});
   $('t-pts').textContent=H.tp===1?'1 ponto livre':H.tp+' pontos livres';
   tree.forEach((br,bi)=>br.n.forEach((nd,ni)=>{const b=$('tn-'+bi+'-'+ni),rk=tr(nd.id),lock=branchPts(bi)<reqPts(ni),can=canLearn(bi,ni);
     b.children[0].textContent=nd.n;b.children[1].textContent='●'.repeat(rk)+'○'.repeat(nd.m-rk);
-    b.children[2].textContent=lock?'Requer '+reqPts(ni)+(reqPts(ni)===1?' ponto':' pontos')+' em '+br.b:nd.d;
+    b.children[2].textContent=lock?'Requer '+reqPts(ni)+(reqPts(ni)===1?' ponto':' pontos')+' no ramo':nd.d;
     b.className='node'+(rk>=nd.m?' max':can?' can':'');b.disabled=!can}));
   const ab=$('t-attr'),done=treeDone();
   if(!ab.children.length)ATTR.forEach(a=>{const b=document.createElement('button');b.type='button';b.id='ta-'+a.id;b.append(document.createElement('b'),document.createElement('span'));b.children[1].textContent=a.d;b.addEventListener('click',()=>addAttr(a.id));ab.appendChild(b)});
-  $('t-amsg').textContent=done?'Atributos: gaste aqui os pontos que sobrarem':'Atributos: liberados quando a árvore estiver completa';
+  $('t-amsg').textContent=done?'Atributos: gaste aqui os pontos que sobrarem':'Atributos: liberados quando a árvore estiver completa';ab.hidden=!done;
   ATTR.forEach((a,i)=>{const b=ab.children[i];b.children[0].textContent=a.n+' '+H.attr[a.id];b.disabled=!done||H.tp<1})}
 
 /* ---------- entrada ---------- */
@@ -1541,7 +1545,7 @@ function render(t){
   ctx.globalAlpha=1;
   if(play&&e>=S0()){const sr=safeR(e);ctx.fillStyle='rgba(96,36,120,.42)';ctx.beginPath();ctx.rect(cam.x-hw-30,cam.y-hh-30,hw*2+60,hh*2+60);ctx.arc(MID,MID,sr,0,TAU,true);ctx.fill('evenodd');
     ctx.strokeStyle='rgba(197,140,240,.9)';ctx.lineWidth=4;ctx.beginPath();ctx.arc(MID,MID,sr,0,TAU);ctx.stroke()}
-  if(P.gfx){
+  {
     if(!still())for(let i=0;i<22;i++){const W=hw*2+120,Hh=hh*2+120,bx=i*197.3+Math.sin(t/2600+i*1.7)*40+t*.004*(1+i%3),by=i*311.7+Math.cos(t/3100+i*2.3)*40-t*.003*(1+i%2),mx=cam.x-W/2+((bx-cam.x+W/2)%W+W)%W,my=cam.y-Hh/2+((by-cam.y+Hh/2)%Hh+Hh)%Hh;
       glow(ctx,mx,my,5+(i%3)*2,i%4?'#ffe9a0':'#9fe8f5',.25+.2*Math.sin(t/500+i*2.1))}
     lx.setTransform(1,0,0,1,0,0);lx.globalCompositeOperation='source-over';lx.globalAlpha=1;lx.fillStyle=play&&e>=S0()?'#a28ecc':'#98a3cf';lx.fillRect(0,0,LT.width,LT.height);
@@ -1648,7 +1652,7 @@ function refreshMenu(){
     const add=(t,you)=>{const li=document.createElement('li');li.textContent=t;if(you)li.className='you';ul.appendChild(li)};
     if(list.length){add(P.name+' (você) · '+TEAMS[P.team],true);list.forEach(o=>add(o.name+' · '+TEAMS[o.team]+(o.mid&&Date.now()-o.at<4000&&o.e<o.dur?' · em partida':'')))}}
   const cd=on?cdTick():null;
-  $('f-dur').hidden=$('f-size').hidden=$('f-mode').hidden=$('f-rules').hidden=!!j||!!cd;
+  $('opts').hidden=!!j||!!cd;$('opts-sum').textContent=P.dur+' min · mapa '+['pequeno','médio','grande'][P.size]+' · '+MODES[P.mode]+(P.rules?' · Caos':'');
   $('mode-note').textContent=[on?'Cada um por si. Vence quem tiver mais Glória.':'','Cada jogador escolhe Sol ou Lua na sala. Vence o time com mais Glória; aliados não se ferem.','Todos no mesmo time: derrotem o Arcanjo Caído antes de o tempo acabar.'][P.mode]+(P.rules?' Caos: eventos a cada 45 s e um modificador sorteado a cada onda.':'');go.disabled=wait||!!cd;
   if(j){go.textContent='Entrar na partida · '+fmt(j.o.dur-Math.max(0,j.est));note.textContent='Partida de '+j.o.name+' em andamento. Você começa no nível 1.'}
   else if(cd){go.textContent='Começando em '+Math.max(0,Math.ceil((cd.end-Date.now())/1000))+' s';note.textContent=MODES[cd.md]+(cd.rl?', Caos':'')+'. Duração '+cd.du+' min, mapa '+['pequeno','médio','grande'][cd.sz]+'.'}
@@ -1670,12 +1674,11 @@ function start(data){
   const nick=$('nick');nick.value=P.name;nick.addEventListener('input',()=>{P.name=nick.value.replace(/[\u0000-\u001f]/g,'').trim().slice(0,12)||'Anjo';save();pushPresence();refreshMenu()});
   for(let i=0;i<CLS.length;i++)$('hero'+i).addEventListener('change',()=>selectHero(i));
   selectHero(P.cls);drawIcons(0);
-  for(const d of DURS)$('dur'+d).addEventListener('change',()=>{P.dur=d;save()});$('dur'+P.dur).checked=true;
-  for(let i=0;i<3;i++)$('size'+i).addEventListener('change',()=>{P.size=i;save()});$('size'+P.size).checked=true;
+  for(const d of DURS)$('dur'+d).addEventListener('change',()=>{P.dur=d;save();refreshMenu()});$('dur'+P.dur).checked=true;
+  for(let i=0;i<3;i++)$('size'+i).addEventListener('change',()=>{P.size=i;save();refreshMenu()});$('size'+P.size).checked=true;
   for(let i=0;i<3;i++)$('mode'+i).addEventListener('change',()=>{P.mode=i;save();refreshMenu()});$('mode'+P.mode).checked=true;
   for(let i=0;i<2;i++){$('rules'+i).addEventListener('change',()=>{P.rules=i;save();refreshMenu()});$('team'+i).addEventListener('change',()=>{P.team=i;save();pushPresence();refreshMenu()})}
   $('rules'+P.rules).checked=true;$('team'+P.team).checked=true;
-  for(let i=0;i<2;i++)$('gfx'+i).addEventListener('change',()=>{P.gfx=i;save()});$('gfx'+P.gfx).checked=true;
   $('b-go').addEventListener('click',()=>{const j=joinable();if(j)startMatch(j.o.mid,j.o.seed,j.o.e+(Date.now()-j.o.at),j.o.du,j.o.sz,j.o.md,j.o.rl);
     else if(cdActive())return;
     else if(roomState==='on'){myCd={mid:Math.random().toString(36).slice(2,8),seed:(Math.random()*2**31)>>>0,du:P.dur,sz:P.size,md:P.mode,rl:P.rules,end:Date.now()+10000};cdMsg=null;pushPresence();refreshMenu()}
