@@ -286,6 +286,7 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
           <input type="radio" name="hero" id="hero3" value="3"><label for="hero3"><canvas width="160" height="168" id="ic3"></canvas><b>Monge</b><span>Vento: veloz, deixa lento</span></label>
           <input type="radio" name="hero" id="hero4" value="4"><label for="hero4"><canvas width="160" height="168" id="ic4"></canvas><b>Sombrio</b><span>Corpo a corpo, puxa e rouba vida</span></label>
           <input type="radio" name="hero" id="hero5" value="5"><label for="hero5"><canvas width="160" height="168" id="ic5"></canvas><b>Zero</b><span>Minas invisíveis e TNT gigante</span></label>
+          <input type="radio" name="hero" id="hero6" value="6"><label for="hero6"><canvas width="160" height="168" id="ic6"></canvas><b>Garra</b><span>Metamorfa: lança de longe, vira raptor</span></label>
         </div>
         <p id="skill-line"></p>
       </div>
@@ -428,7 +429,9 @@ const CLS=[
  {n:'Sombrio',hp:500,dmg:32,range:68,itv:.85,spd:190,arm:2,proj:0,
   s1:{n:'Agarre Sombrio',cd:8,d:'puxa para perto de você os inimigos à sua frente e os fere (chefes resistem ao puxão).'},s2:{n:'Eclipse Rubro',cd:60,d:'gira a lâmina por 4 s ferindo quem está em volta; nesse tempo, 15% do dano causado vira cura.'}},
  {n:'Zero',hp:470,dmg:24,range:66,itv:.8,spd:192,arm:2,proj:0,
-  s1:{n:'Mina',cd:5,d:'planta uma mina que os inimigos não veem (até 3 no chão). Explode quando alguém chega perto; cada inimigo atingido dá +6% de dano por 8 s (até +30%).'},s2:{n:'TNT Gigante',cd:60,d:'arremessa um TNT enorme que pisca e explode numa área grande. Suas explosões não ferem você nem aliados.'}}];
+  s1:{n:'Mina',cd:5,d:'planta uma mina que os inimigos não veem (até 3 no chão). Explode quando alguém chega perto; cada inimigo atingido dá +6% de dano por 8 s (até +30%).'},s2:{n:'TNT Gigante',cd:60,d:'arremessa um TNT enorme que pisca e explode numa área grande. Suas explosões não ferem você nem aliados.'}},
+ {n:'Garra',hp:450,dmg:26,range:200,itv:.8,spd:190,arm:1,proj:1,
+  s1:{n:'Bote do Raptor',cd:10,d:'vira raptor por 6 s e salta à frente rasgando quem está no caminho. Como raptor você luta corpo a corpo, anda e ataca 30% mais rápido e causa 15% mais dano.'},s2:{n:'Rugido Alfa',cd:60,d:'vira raptor por 8 s e ruge: fere e deixa lentos os inimigos em volta e acelera os aliados próximos por 3 s.'}}];
 /* Aparência dos heróis: cada visual é só uma paleta. Novos visuais entram aqui. */
 const SKIN=[
  {metal:'#cfd6e6',metal2:'#8f9ab8',trim:'#e2b24c',cloth:'#3f5fb0',dark:'#2a3350',blade:'#eef2fb'},
@@ -436,7 +439,8 @@ const SKIN=[
  {cloth:'#4f8fc4',cloth2:'#2f5f94',trim:'#e6f7ff',glow:'#9fe8ff',dark:'#16263f',wood:'#7a8fa8'},
  {cloth:'#ece4cf',cloth2:'#2f8f86',trim:'#e2b24c',skin:'#e3b68c',wrap:'#cdc3a8',dark:'#3a2f25',wood:'#8a6a4a',bead:'#7a4b2a',glow:'#bfeee4'},
  {metal:'#3d4258',metal2:'#262a3a',cloth:'#6e1c28',dark:'#12141c',trim:'#b8404a',blade:'#ff5a5a',glow:'#ff4a4a'},
- {cloth:'#4f9a4a',cloth2:'#2f6b36',dark:'#1d2a1c',trim:'#e2b24c',glow:'#ff9a4a'}];
+ {cloth:'#4f9a4a',cloth2:'#2f6b36',dark:'#1d2a1c',trim:'#e2b24c',glow:'#ff9a4a'},
+ {cloth:'#8a5a2e',cloth2:'#5e3c1f',dark:'#2a1d12',trim:'#e2b24c',glow:'#9fd86a',skin:'#d9a878',bone:'#efe6cf',scale:'#5f8f4a',scale2:'#3f6a38',stripe:'#e39a4c'}];
 /* Árvore de talentos: 3 ramos por herói, 3 nós por ramo. */
 const TAL=[
  [{b:'Fúria',n:[{id:'dmg',n:'Lâmina Solar',m:3,d:'+8% de dano por ponto'},{id:'cleave',n:'Golpe Amplo',m:3,d:'Ataques ferem quem está ao lado do alvo: 20% do dano por ponto'},{id:'exec',n:'Executor',m:1,d:'+35% de dano em alvos com menos de 35% de vida'}]},
@@ -456,7 +460,10 @@ const TAL=[
   {b:'Domínio',n:[{id:'s1',n:'Agarre Maior',m:3,d:'+20% de dano do Agarre por ponto'},{id:'cdr',n:'Foco',m:3,d:'-8% de recarga das habilidades por ponto'},{id:'ult',n:'Eclipse Total',m:1,d:'O Eclipse Rubro dura 2 s a mais e deixa os atingidos um pouco lentos'}]}],
  [{b:'Pólvora',n:[{id:'dmg',n:'Pavio Curto',m:3,d:'+8% de dano por ponto'},{id:'crit',n:'Faísca',m:3,d:'10% de chance de dano em dobro por ponto'},{id:'exec',n:'Demolidor',m:1,d:'+35% de dano em alvos com menos de 35% de vida'}]},
   {b:'Casca',n:[{id:'hp',n:'Casca Grossa',m:3,d:'+10% de vida por ponto'},{id:'spd',n:'Pés Ligeiros',m:3,d:'+5% de movimento por ponto'},{id:'dodge',n:'Esquiva',m:1,d:'20% de chance de evitar um golpe'}]},
-  {b:'Arsenal',n:[{id:'s1',n:'Carga Extra',m:3,d:'+20% de dano da Mina por ponto'},{id:'cdr',n:'Mãos Rápidas',m:3,d:'-8% de recarga das habilidades por ponto'},{id:'ult',n:'Megaton',m:1,d:'TNT Gigante com área maior, que deixa os atingidos lentos'}]}]];
+  {b:'Arsenal',n:[{id:'s1',n:'Carga Extra',m:3,d:'+20% de dano da Mina por ponto'},{id:'cdr',n:'Mãos Rápidas',m:3,d:'-8% de recarga das habilidades por ponto'},{id:'ult',n:'Megaton',m:1,d:'TNT Gigante com área maior, que deixa os atingidos lentos'}]}],
+ [{b:'Presa',n:[{id:'dmg',n:'Garras Afiadas',m:3,d:'+8% de dano por ponto'},{id:'crit',n:'Ponto Fraco',m:3,d:'10% de chance de dano em dobro por ponto'},{id:'exec',n:'Predadora',m:1,d:'+35% de dano em alvos com menos de 35% de vida'}]},
+  {b:'Instinto',n:[{id:'spd',n:'Passada Larga',m:3,d:'+5% de movimento por ponto'},{id:'aspd',n:'Frenesi',m:3,d:'+8% de velocidade de ataque por ponto'},{id:'dodge',n:'Reflexo',m:1,d:'20% de chance de evitar um golpe'}]},
+  {b:'Matilha',n:[{id:'s1',n:'Bote Feroz',m:3,d:'+20% de dano do Bote por ponto'},{id:'cdr',n:'Faro',m:3,d:'-8% de recarga das habilidades por ponto'},{id:'ult',n:'Alfa',m:1,d:'Rugido Alfa com área maior, e a forma de raptor dele dura 4 s a mais'}]}]];
 const MON=[null,
  {n:'Diabrete',hp:60,dmg:6,xp:14,g:8,spd:112,r:12,itv:1.1,h:30,col:'#c0567f'},
  {n:'Lobo sombrio',hp:150,dmg:13,xp:34,g:18,spd:150,r:14,itv:1,h:30,col:'#7d8fb8'},
@@ -552,7 +559,8 @@ const EVO=[
  [{n:'Estilhaço',d:'Área menor, explode mais rápido e causa mais dano.'},{n:'Geada',d:'Área maior e menos dano; deixa o chão gelado por 3 s, retardando quem passa.'}],
  [{n:'Empurrão',d:'A Lufada joga os inimigos para longe.'},{n:'Vento de Cauda',d:'Aceleração de 4 s, recarga 25% menor, e aliados próximos também aceleram.'}],
  [{n:'Agarre Longo',d:'Alcança mais longe e deixa os puxados um pouco lentos.'},{n:'Repulsão',d:'Em vez de puxar, empurra os inimigos para longe e fere mais.'}],
- [{n:'Mina Pesada',d:'Explosão maior e mais forte, que deixa lento; a mina dura 30 s.'},{n:'Campo Minado',d:'Planta duas minas de uma vez (até 4 no chão), cada uma com menos dano.'}]];
+ [{n:'Mina Pesada',d:'Explosão maior e mais forte, que deixa lento; a mina dura 30 s.'},{n:'Campo Minado',d:'Planta duas minas de uma vez (até 4 no chão), cada uma com menos dano.'}],
+ [{n:'Emboscada',d:'Bote mais longo e com 45% mais dano.'},{n:'Matilha',d:'Bote mais fraco, mas cura 8% da sua vida e acelera os aliados próximos por 3 s.'}]];
 const ally=o=>G.mode>0&&o.team===G.team;
 const G={mode:0,rules:0,team:-1,mod:-1,won:false,allies:[],state:'menu',mid:'',seed:0,off:0,map:null,wave:-1,creeps:[],deadC:new Set(),myCk:[],myCc:[],chests:[],proj:[],fx:[],txt:[],zones:[],parts:[],dying:[],bosses:[],dur:600000,spawn:null,foes:[],heroes:[],stormSaid:false,mini:null,sheet:'',shake:0,vig:null};
 let H=null;
@@ -577,9 +585,9 @@ function stats(){const c=CLS[H.cls],l=H.lv-1,a=H.attr;
   H.mhp=Math.round(c.hp*(1+.11*l)*(1+.15*H.up.armor+.08*H.tH+.1*tr('hp')+.05*a.vit+.35*rl('heart')+.5*rl('crown')+.8*rl('myth')));
   H.dmg=c.dmg*(1+.09*l)*(1+.12*H.up.blade+.06*H.tD+.08*tr('dmg')+.04*a.str+.25*rl('eye')+.6*rl('blade')+.3*rl('crown')+.8*rl('myth'));
   H.arm=c.arm+2*H.up.armor+.3*l+6*rl('heart');H.spd=c.spd*(1+.06*H.up.boots+.05*tr('spd')+.01*a.agi+.15*rl('wings')+.25*rl('myth'));
-  H.itv=c.itv/(1+.1*H.up.gloves+.08*tr('aspd')+.03*a.agi+.2*rl('wings')+.25*rl('myth'));H.range=c.range}
+  H.itv=c.itv/(1+.1*H.up.gloves+.08*tr('aspd')+.03*a.agi+.2*rl('wings')+.25*rl('myth'));H.range=c.range;if(H.cls===6&&H.rapOn){H.range=70;H.spd*=1.3;H.itv/=1.3;H.dmg*=1.15}}
 function newHero(){H={kind:'me',r:13,cls:P.cls,x:0,y:0,face:0,lv:1,xp:0,gold:0,evo:0,kills:0,kgl:0,streak:0,mk:0,deaths:0,hp:1,mhp:1,atk:0,cd1:0,cd2:0,pot:0,dead:false,respawnAt:0,inv:0,
-  up:{blade:0,armor:0,gloves:0,boots:0},tal:{},attr:{str:0,vit:0,agi:0},rel:{},tp:0,tD:0,tH:0,fury:0,haste:0,wrath:0,slow:0,chill:0,root:0,boomN:0,boomT:0,free:0,leech:0,curse:0,bless:0,port:0,pull:null,dash:null,tw:null,twAt:0,pk:0,aegisCd:0,phxCd:0,hurtAt:-1e9,target:null,sel:0,
+  up:{blade:0,armor:0,gloves:0,boots:0},tal:{},attr:{str:0,vit:0,agi:0},rel:{},tp:0,tD:0,tH:0,fury:0,haste:0,wrath:0,slow:0,chill:0,root:0,boomN:0,boomT:0,rap:0,rapOn:false,free:0,leech:0,curse:0,bless:0,port:0,pull:null,dash:null,tw:null,twAt:0,pk:0,aegisCd:0,phxCd:0,hurtAt:-1e9,target:null,sel:0,
   walk:0,mv:0,sw:0,swD:.25,ct:0,ctD:.4,ck:0,flash:0,bf:0,col:'#f6e3a1'};stats();H.hp=H.mhp}
 /* Eventos: a agenda e os lugares saem da semente, então são iguais em todos os aparelhos.
    Altar (pares) e Baú Amaldiçoado (ímpares) a cada 2 min, nunca na tempestade. Portais: um par fixo nos mapas médio e grande. */
@@ -742,7 +750,7 @@ function pickTarget(){let b=null,bs=1e9;each(t=>{const raw=Math.hypot(t.x-H.x,t.
 function shoot(t,d,crit,w){const k=CLS[H.cls].proj;G.proj.push({x:H.x+Math.cos(H.face)*18,y:H.y-27+Math.sin(H.face)*8,t,tx:t.x,ty:t.y-hgt(t)*.45,gx:t.x,gy:t.y,ga:H.face,d,spd:k===1?720:k===6?640:520,k,mine:true,a:H.face,w:w||0,crit})}
 function attack(t){const C=CLS[H.cls];let d=outDmg(t,H.dmg)*(.9+Math.random()*.2),crit=false;if(Math.random()<.1*tr('crit')+.15*rl('eye')){d*=2;crit=true}
   lastAtk=[++aseq,Math.round(t.x),Math.round(t.y)];H.sw=H.swD=Math.min(.3,H.itv*.55);
-  if(C.proj===0){dealt(t,d,0,crit);fx('slash',t.x,t.y-hgt(t)*.45,{a:H.face,T:.2,col:H.cls===4?'#ffb0a8':'#fff3c4'});if(tr('cleave'))aoe(t.x,t.y,64,d*.2*tr('cleave'),t);
+  if(C.proj===0||H.rapOn){dealt(t,d,0,crit);fx('slash',t.x,t.y-hgt(t)*.45,{a:H.face,T:.2,col:H.cls===4?'#ffb0a8':'#fff3c4'});if(tr('cleave'))aoe(t.x,t.y,64,d*.2*tr('cleave'),t);
     if(rl('blade')){aoe(t.x,t.y,72,d*.4,t);fx('ring',t.x,t.y,{r:72,T:.3,col:'#ffe9a0'})}}
   else{shoot(t,d,crit,0);if(tr('echo')&&Math.random()<.3)shoot(t,d,false,.16)}}
 function mkZone(kind,x,y,mine,d,cap,a,own,ev){
@@ -786,6 +794,9 @@ function doSkill(o,cls,k,x,y,ang,mine,m,s1m,ev){ev=ev|0;
     if(!k){if(mine){if(ev===1)shove(o,ang,210,.6,m*1.9*s1m,1,170);else cone(o.x,o.y,ang,210,.6,m*1.9*s1m,1)}fx('gust',o.x,o.y,{a:ang,r:ev===1?260:210,half:.6,T:.5});if(ev===2)fx('ring',o.x,o.y,{r:240,T:.5,col:'#bfeee4'});fx('gust',o.x,o.y,{a:ang,r:170,half:.45,T:.42,t:-.08});
       for(let j=0;j<12;j++){const a=ang+(Math.random()-.5)*1.1,v=300+Math.random()*220;part(o.x+Math.cos(a)*18,o.y-22+Math.sin(a)*18,Math.cos(a)*v,Math.sin(a)*v*.8,.45,2.2,Math.random()<.5?'#ffffff':'#bfeee4')}}
     else{mkZone('tornado',o.x,o.y,mine,m*1.2,k===2,ang);burst(o.x,o.y-24,16,'#bfeee4',200,.6,4);shake(5)}}
+  else if(cls===6){
+    if(!k){const L=ev===1?250:200;if(mine)cone(o.x,o.y,ang,L,.55,m*(ev===1?3.2:ev===2?1.8:2.2)*s1m,0);fx('cone',o.x,o.y,{a:ang,r:L,half:.55,T:.3,col:'#ffb36a'});fx('ring',o.x,o.y,{r:46,T:.35,col:'#9fd86a'});burst(o.x,o.y-24,14,'#9fd86a',200,.5,4);for(let j=0;j<3;j++)fx('slash',o.x+Math.cos(ang)*(50+j*42),o.y-26+Math.sin(ang)*(50+j*42),{a:ang+(j-1)*.3,T:.25+j*.06,col:'#fff3c4',s:1.2});if(ev===2)fx('ring',o.x,o.y,{r:240,T:.5,col:'#9fd86a'});shake(4)}
+    else{const R=k===2?270:220;if(mine)aoe(o.x,o.y,R,m*4,null,1);fx('ring',o.x,o.y,{r:R,T:.6,col:'#ffb36a'});fx('ring',o.x,o.y,{r:R*.66,T:.8,col:'#fff3c4'});fx('ring',o.x,o.y,{r:R*.33,T:1,col:'#ffb36a'});fx('flash',o.x,o.y,{r:R,T:.3,col:'#ffd27a'});burst(o.x,o.y-30,24,'#ffb36a',300,.7,5);shake(9)}}
   else if(cls===5){
     if(!k){if(mine||ally(o)){const n=ev===2?2:1;for(let j=0;j<n;j++){const q=n>1?(j?34:-34):0;mkZone('mine',clamp(x-Math.sin(ang)*q,TILE,WORLD-TILE),clamp(y+Math.cos(ang)*q,TILE,WORLD-TILE),mine,m*(ev===1?3.6:ev===2?2.2:3)*s1m,false,o,null,ev)}}if(mine)burst(o.x,o.y-6,6,'#56684e',90,.3,3)}
     else{mkZone('tnt',x,y,mine,m*8,k===2,o);burst(o.x,o.y-40,8,'#ffd27a',120,.4,3)}}
@@ -801,7 +812,7 @@ function tpTornado(){const z=H.tw,e=now();if(e<H.twAt)return;H.tw=null;const sp=
   fx('gust',H.x,H.y,{a:Math.atan2(sp[1]-H.y,sp[0]-H.x),r:90,half:1.2,T:.4});burst(H.x,H.y-24,16,'#e8fbf6',200,.5,3.5);
   H.x=sp[0];H.y=sp[1];H.ct=H.ctD=.35;H.ck=1;aoe(H.x,H.y,120,outDmg(null,H.dmg)*1.5,null,1);fx('ring',H.x,H.y,{r:120,T:.45,col:'#bfeee4'});fx('ring',H.x,H.y,{r:70,T:.3,col:'#ffffff'});burst(H.x,H.y-30,22,'#ffffff',260,.6,3.5);shake(5);pushPresence();hud()}
 /* Mira: arrastar o dedo a partir do botão da habilidade escolhe a direção (e a distância, nas de área). Toque simples usa a mira automática. */
-const AIMS=[[null,null],[{t:'cone',r:300,h:.5},{t:'zone',r:170}],[{t:'zone',r:125},{t:'zone',r:180}],[{t:'cone',r:210,h:.6},{t:'line',r:110,d:525}],[{t:'cone',r:280,h:.62},null],[null,{t:'zone',r:210}]];
+const AIMS=[[null,null],[{t:'cone',r:300,h:.5},{t:'zone',r:170}],[{t:'zone',r:125},{t:'zone',r:180}],[{t:'cone',r:210,h:.6},{t:'line',r:110,d:525}],[{t:'cone',r:280,h:.62},null],[null,{t:'zone',r:210}],[{t:'cone',r:200,h:.55},null]];
 const aimOf=i=>{const A=AIMS[H.cls][i];if(i||!H.evo||!A)return A;const v=H.evo;return H.cls===1?(v===1?{t:'cone',r:460,h:.085}:{t:'cone',r:280,h:.9}):H.cls===2?{t:'zone',r:v===1?90:170}:H.cls===4?{t:'cone',r:v===1?360:240,h:.62}:H.cls===3&&v===1?{t:'cone',r:260,h:.6}:A};
 const aim={i:-1,id:null,sx:0,sy:0,a:0,d:0,on:false};
 function aimStart(i,ev){ev.preventDefault();if(G.state!=='play'||!H||H.dead)return;const A=aimOf(i);
@@ -817,6 +828,7 @@ function cast(i,am){const e=now();if(G.state!=='play'||!H||H.dead||e<0)return;if
   if(H.cls===3&&!i)H.haste=Math.max(H.haste,e+(H.evo===2?4000:2000));
   if(H.cls===4&&i)H.leech=e+4000+2000*tr('ult');
   if(H.cls===0){H.hp=Math.min(H.mhp,H.hp+H.mhp*(i?.2:H.evo===1?0:H.evo===2?.12:.07));if(!i){if(e<H.slow||e<H.chill||e<H.root)ftext(H.x,H.y-84,'purificado','#fff3c4');H.slow=0;H.chill=0;H.root=0;H.free=e+(H.evo===2?3000:2000);if(e<H.curse){H.curse=e+(H.curse-e)/2;ftext(H.x,H.y-98,'maldição encurtada','#fff3c4')}}if(i)H.wrath=e+6000+3000*tr('ult')}
+  if(H.cls===6){H.rap=e+(i?8000+4000*tr('ult'):6000);if(!H.rapOn){H.rapOn=true;stats()}if(!i){const v=H.evo===1?800:640;H.dash={vx:Math.cos(ang)*v,vy:Math.sin(ang)*v,t:.25};if(H.evo===2){H.hp=Math.min(H.mhp,H.hp+H.mhp*.08);for(const a of G.allies)if(Math.hypot(a.x-H.x,a.y-H.y)<240)allyFx(a,8,0)}}else for(const a of G.allies)if(Math.hypot(a.x-H.x,a.y-H.y)<260)allyFx(a,8,0)}
   doSkill(H,H.cls,k,px,py,ang,true,outDmg(null,H.dmg),1+.2*tr('s1'),i?0:H.evo);
   if(H.cls===1&&!i){burst(H.x,H.y-8,8,'#e2c79a',120,.35,3);H.dash={vx:-Math.cos(ang)*590,vy:-Math.sin(ang)*590,t:.22}}
   if(!i&&H.evo===2){if(H.cls===0)for(const a of G.allies)if(Math.hypot(a.x-H.x,a.y-H.y)<220)allyFx(a,9,8);if(H.cls===3)for(const a of G.allies)if(Math.hypot(a.x-H.x,a.y-H.y)<240)allyFx(a,8,0)}
@@ -921,7 +933,7 @@ function update(dt,t){
   if(!H.dead)G.heroes.push(H);for(const o of G.foes)G.heroes.push(o);for(const o of G.allies)G.heroes.push(o);
   if(e>=S0()&&!G.stormSaid){G.stormSaid=true;toast('A tempestade começou a fechar a arena. Vá para o centro')}
   /* herói */
-  tickAnim(H,dt);H.bf=(e<H.fury?1:0)|(e<H.haste?2:0)|(e<H.inv?4:0)|(e<H.wrath?8:0)|(e<H.curse?16:0)|(e<H.bless?32:0)|(e<H.root?64:0);
+  tickAnim(H,dt);H.bf=(e<H.fury?1:0)|(e<H.haste?2:0)|(e<H.inv?4:0)|(e<H.wrath?8:0)|(e<H.curse?16:0)|(e<H.bless?32:0)|(e<H.root?64:0)|(H.rapOn?128:0);{const rp=H.cls===6&&e<H.rap&&!H.dead;if(rp!==!!H.rapOn){H.rapOn=rp;stats();burst(H.x,H.y-24,12,'#9fd86a',160,.5,4)}}
   if(H.dead){H.mv=0;if(e>=H.respawnAt){H.dead=false;H.x=G.spawn.x;H.y=G.spawn.y;H.hp=H.mhp;H.inv=e+3000;H.slow=0;H.chill=0;H.root=0;H.pull=null;H.dash=null;respawnFx(H.x,H.y)}}
   else{
     if(H.dash){const D=H.dash,st=Math.min(D.t,dt);moveC(H,D.vx*st,D.vy*st,13);D.t-=dt;if(D.t<=0)H.dash=null;if(Math.random()<.7)part(H.x,H.y-3,0,-14,.3,2.6,'#6e665c')}
@@ -1138,7 +1150,7 @@ function netRead(){
       if(kr===5){const zi=G.zones.findIndex(z=>z.kind==='mine'&&!z.mine&&Math.hypot(z.x-sx1,z.y-sy1)<24);if(zi>=0)G.zones.splice(zi,1);boomFx(sx1,sy1,clamp(num(s.sx[3]),60,200))}
       else{o.ct=o.ctD=k?.8:.4;o.ck=k?1:0;doSkill(o,o.cls,k,sx1,sy1,num(s.sx[3])/100,false,0,1,kr>=3?kr-2:0)}}
     if(Array.isArray(s.a)&&num(s.a[0])>o.aseq){o.aseq=num(s.a[0]);const x=clamp(num(s.a[1]),0,WORLD),y=clamp(num(s.a[2]),0,WORLD);o.sw=o.swD=.25;
-      if(CLS[o.cls].proj===0)fx('slash',x,y-26,{a:Math.atan2(y-o.y,x-o.x),T:.2,col:o.cls===4?'#ffb0a8':'#fff3c4'});else G.proj.push({x:o.x,y:o.y-27,t:null,tx:x,ty:y-26,d:0,spd:o.cls===1?720:o.cls===3?640:520,k:CLS[o.cls].proj,mine:false,a:0,w:0})}
+      if(CLS[o.cls].proj===0||(o.bf&128))fx('slash',x,y-26,{a:Math.atan2(y-o.y,x-o.x),T:.2,col:o.cls===4?'#ffb0a8':'#fff3c4'});else G.proj.push({x:o.x,y:o.y-27,t:null,tx:x,ty:y-26,d:0,spd:o.cls===1?720:o.cls===3?640:520,k:CLS[o.cls].proj,mine:false,a:0,w:0})}
   }
   if(G.state==='menu')others.forEach((o,k)=>{if(o.gone)others.delete(k)});
   if(G.state==='play')rockSync();
@@ -1388,6 +1400,24 @@ function drawHero(c,o,t,me){
     c.strokeStyle='#2a2018';c.lineWidth=1.8;c.lineCap='round';c.beginPath();c.moveTo(-2,-48+b);c.quadraticCurveTo(-6,-55+b,-3-sway,-58+b);c.stroke();glow(c,-3-sway,-58+b,5+Math.sin(t/90)*1.5,'#ffd27a',.9);c.fillStyle='#fff3c4';circ(c,-3-sway,-58+b,1.5);
     const th=sp>=0?-2.2+sp*3:cp>=0?-1.9:la*.4-.2;c.save();c.translate(6,-25+b);c.rotate(th);c.strokeStyle=S.cloth2;c.lineWidth=4;c.lineCap='round';c.beginPath();c.moveTo(0,0);c.lineTo(11,0);c.stroke();
     c.beginPath();c.arc(15,0,5.2,0,TAU);fs(c,'#2a2f3a');c.fillStyle='rgba(255,255,255,.3)';circ(c,13.6,-1.6,1.4);c.strokeStyle='#8a6a4a';c.lineWidth=1.4;c.beginPath();c.moveTo(18,-4);c.lineTo(21,-7);c.stroke();glow(c,21,-7,4,'#ffd27a',.9);c.restore();
+  }else if(o.cls===6){
+    if(o.bf&128){const bt=sp>=0?Math.sin(sp*Math.PI):0,tl=[[-8,-22+b],[-24,-24+b],[-35,-15+b+sway]];
+      for(const[col,w]of[[OUT,9],[S.scale,6.5]]){c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';c.beginPath();c.moveTo(tl[0][0],tl[0][1]);c.quadraticCurveTo(tl[1][0],tl[1][1],tl[2][0],tl[2][1]);c.stroke()}
+      for(const sd of[-1,1]){const ph=wp+(sd>0?0:Math.PI),dx=Math.sin(ph)*7*mv,dy=-Math.max(0,Math.cos(ph))*4*mv;for(const[col,w]of[[OUT,6],[S.scale2,4]]){c.strokeStyle=col;c.lineWidth=w;c.lineJoin='round';c.beginPath();c.moveTo(-2+sd*2,-16+b);c.lineTo(-5+sd*2+dx*.4,-8+dy);c.lineTo(1+sd*2+dx,-1+dy);c.lineTo(5+sd*2+dx,-1+dy);c.stroke()}}
+      c.beginPath();c.ellipse(0,-22+b,14,9,-.15,0,TAU);fs(c,S.scale);c.fillStyle='rgba(255,255,255,.16)';ell(c,1,-17.5+b,9,3);
+      c.strokeStyle=S.stripe;c.lineWidth=2.2;c.lineCap='round';for(const q of[-8,-2,4]){c.beginPath();c.moveTo(q,-30+b);c.lineTo(q-2,-24+b);c.stroke()}
+      c.strokeStyle=S.scale2;c.lineWidth=3;c.beginPath();c.moveTo(8,-19+b);c.lineTo(13,-14+b-bt*4);c.stroke();
+      c.save();c.translate(10,-28+b);c.rotate(-.5+la*.35-bt*.3);for(const[col,w]of[[OUT,9],[S.scale,6.5]]){c.strokeStyle=col;c.lineWidth=w;c.beginPath();c.moveTo(0,0);c.lineTo(9,-7);c.stroke()}
+      c.translate(9,-8);c.rotate(.5);c.fillStyle=S.stripe;tri(c,-4,-5,-10,-10,-1,-5.5);tri(c,-1,-5.5,-5,-12,3,-5);
+      c.save();c.rotate(.12+bt*.55+(cp>=0?.6:0));c.beginPath();c.moveTo(-2,1);c.lineTo(12,2);c.lineTo(11,4.6);c.lineTo(-2,4);c.closePath();fs(c,S.scale2);c.restore();
+      c.beginPath();c.moveTo(-4,-5);c.lineTo(12,-3.5);c.lineTo(14.5,0);c.lineTo(-3,1.2);c.closePath();fs(c,S.scale);c.fillStyle=S.bone;for(const q of[4,7,10])tri(c,q,.6,q+1.6,.6,q+.8,2.8);
+      c.fillStyle='#fff3c4';circ(c,3,-2.2,1.6);c.fillStyle='#1a1410';circ(c,3.5,-2.2,.75);c.restore();
+    }else{legs(c,wp,mv,S.cloth2,S.dark);
+      c.beginPath();c.moveTo(-7,-31+b);c.lineTo(7,-31+b);c.lineTo(9,-12);c.lineTo(-9,-12);c.closePath();fs(c,S.cloth);c.fillStyle=S.scale;c.fillRect(-8.5,-17,17,3.4);c.fillStyle=S.bone;for(const q of[-5,0,5])tri(c,q-1.7,-28+b,q+1.7,-28+b,q,-23.5+b);
+      c.beginPath();c.arc(0,-38+b,7,0,TAU);fs(c,S.skin);c.fillStyle=S.dark;circ(c,2.6,-38+b,1.1);circ(c,5.6,-38+b,1);
+      c.fillStyle=S.stripe;tri(c,-7,-47+b,-14-sway,-53+b,-4,-49+b);tri(c,-8,-43+b,-16-sway,-45+b,-7,-46.5+b);
+      c.beginPath();c.moveTo(-8,-39+b);c.quadraticCurveTo(-7,-50+b,3,-48+b);c.lineTo(13,-43+b);c.lineTo(11,-40.5+b);c.lineTo(-8,-41+b);c.closePath();fs(c,S.bone);c.fillStyle=S.dark;circ(c,4,-44.6+b,1.5);
+      const th=sp>=0?-2.4+sp*2.8:cp>=0?-1.2:-.5+la*.3;c.save();c.translate(6,-26+b);c.rotate(th);c.strokeStyle=OUT;c.lineWidth=4;c.lineCap='round';c.beginPath();c.moveTo(-12,0);c.lineTo(20,0);c.stroke();c.strokeStyle='#8a6a4a';c.lineWidth=2.2;c.beginPath();c.moveTo(-12,0);c.lineTo(20,0);c.stroke();c.fillStyle=S.bone;tri(c,19,-3.6,28,0,19,3.6);c.fillStyle=S.skin;circ(c,2,0,3);c.restore()}
   }else{
     const hem=Math.sin(wp)*2*mv;
     c.fillStyle=S.dark;ell(c,-3+Math.sin(wp)*3*mv,-1,3.6,2.2);ell(c,3-Math.sin(wp)*3*mv,-1,3.6,2.2);
