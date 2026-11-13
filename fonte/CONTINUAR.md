@@ -35,6 +35,8 @@ addhero.py / addart.sh leem os blobs de /tmp/claude-tool-results/*/ (imagens tra
 - patch29: 7ª heroína, Garra, a metamorfa (humana: lança, alcance 200; Bote do Raptor 10 s: vira raptor 6 s e salta, corpo a corpo, +30% andar/atacar, +15% dano; Rugido Alfa 60 s: raptor 8 s, 4× o ataque em 220, lentidão, acelera aliados). Forma no bit 128 de bf; H.rap/H.rapOn. Raptor de desenho próprio (o dono citou a Blue de Jurassic World como inspiração; não copiar a personagem).
 - A fonte agora fica no repositório, pasta fonte/ (sem zip): copiar para cá ao retomar. Só a v1 é publicada (raiz).
 
+- patch30: 8º herói, Sentinela (robô blindado; o dono citou RoboCop como inspiração, desenho e nome próprios). 540 de vida, tiro rápido e fraco (16 a cada 0,42 s, alcance 210), o mais lento (172). Raio Perfurante 8 s (4,2× o ataque em linha de 420, lentidão leve). Modo Cerco 60 s (6 s: +80% cadência, +70 alcance, -30% dano sofrido, metade da velocidade). bf 256 = cerco, 512 = escudo.
+
 ## Ideias ainda não feitas
 - Caçadora: companheiro animal domado (ideia do dono, não feita).
 - Versão simples: redesenhar criaturas uma a uma; dar o mesmo movimento aos chefes; capa e cabelo dos heróis reagindo mais.
