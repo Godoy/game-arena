@@ -1250,7 +1250,7 @@ function drawHero(c,o,t,me){
     if(ult)glow(c,0,-28,38,S.glow||'#ffe9a0',.5);
     const by=(sp<0&&cp<0&&mv<=.3&&M.a.idle[1]===1)?1+.013*Math.sin(t/560+o.x*.01):1;if(!(sp<0&&cp<0&&mv<=.3&&idleDraw(c,'h'+o.cls,t,o.x*.013,o.icon?56:74,3)))animDraw(c,AI,fr,fb,bq,-M.ax*f,-M.ay*f*by+3,M.fw*f,M.fh*f*by);
     for(let j=0;j<sh;j++){const a=sa+j*TAU/3;if(Math.sin(a)>=0){const x=Math.cos(a)*24,y=-38+Math.sin(a)*6;glow(c,x,y,9,S.glow||'#ffe9a0',.5);c.fillStyle='#ffffff';c.beginPath();c.moveTo(x,y-6);c.lineTo(x+3,y);c.lineTo(x,y+6);c.lineTo(x-3,y);c.closePath();c.fill()}}}
-  else if(o.lv>=4)wings(c,o.lv,t,ult?Math.sin(cp*Math.PI):(o.bf&8)?.5:0);
+  else if(o.lv>=4)glow(c,0,-22,26+Math.min(16,o.lv),S.glow||'#ffe9a0',.24+.1*Math.sin(t/400)+(ult?.3:0));
   if(AI){}
   else if(o.cls===0){
     c.fillStyle=S.cloth;c.beginPath();c.moveTo(-5,-31+b);c.lineTo(3,-31+b);c.lineTo(-3-sway,-7);c.lineTo(-13-sway*1.6,-5);c.closePath();c.fill();c.strokeStyle=OUT;c.lineWidth=1.2;c.stroke();
@@ -1326,7 +1326,7 @@ function drawHero(c,o,t,me){
     glow(c,23,0,10*pl,S.glow,.6);c.fillStyle=S.glow;circ(c,23,0,4.4);c.fillStyle='#fff';circ(c,22,-1.2,1.7);c.restore();
     if(cp>=0)for(let j=0;j<3;j++){const a=t/90+j*2.09;glow(c,Math.cos(a)*18,-30+Math.sin(a)*8,5,S.glow,.9)}
   }
-  if(o.lv>=10&&!AI){const hy=o.cls===2?-66:-53;glow(c,0,hy+b,14,'#e2b24c',.5);c.strokeStyle='#e2b24c';c.lineWidth=2.4;c.beginPath();c.ellipse(0,hy+b,9,3.2,0,0,TAU);c.stroke()}
+  if(o.lv>=10&&!AI){const hy=o.cls===2?-66:-53;for(let j=0;j<3;j++){const a=t/900+j*TAU/3,x=Math.cos(a)*22,y=hy+18+b+Math.sin(a)*6;glow(c,x,y,8,S.glow||'#ffe9a0',.45);c.fillStyle='#ffffff';c.beginPath();c.moveTo(x,y-6);c.lineTo(x+3,y);c.lineTo(x,y+6);c.lineTo(x-3,y);c.closePath();c.fill()}}
   c.restore();
   if(o.bf&8)glow(c,o.x,o.y-26,40,'#ffe9a0',.35);
   if(o.bf&1)glow(c,o.x,o.y-26,34,'#d9534a',.4);
@@ -1435,9 +1435,6 @@ function drawArch(c,B,t){
   c.strokeStyle='rgba(217,83,74,.55)';c.lineWidth=3;c.setLineDash([14,10]);c.lineDashOffset=still()?0:t/40;c.beginPath();c.ellipse(0,0,66,26,0,0,TAU);c.stroke();c.setLineDash([]);
   c.fillStyle='rgba(0,0,0,.4)';ell(c,0,0,42,15);
   c.scale(B.dr,1);c.translate(0,-14+Math.sin(t/500)*5);
-  for(const s of[-1,1])for(let i=0;i<3;i++){c.save();c.scale(s,1);c.translate(10,-70+i*4);c.rotate(-.9+i*.55+fl*(.18-i*.03)-(sp>=0?.2:0));
-    c.fillStyle=i===0?'#2a1c30':i===1?'#3a2338':'#4a2a3c';c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(40,-30,82-i*12,-8);c.lineTo(66-i*10,2);c.lineTo(72-i*12,12);c.lineTo(52-i*8,12);c.lineTo(56-i*9,22);c.lineTo(34-i*4,16);c.quadraticCurveTo(14,14,0,8);c.closePath();c.fill();
-    c.strokeStyle='rgba(217,83,74,.4)';c.lineWidth=1.5;c.stroke();c.restore()}
   c.fillStyle='#3a1420';c.beginPath();c.moveTo(-18,-62);c.lineTo(18,-62);c.lineTo(24,-18);for(let i=0;i<4;i++){const xx=24-i*12;c.lineTo(xx-6,-4+Math.sin(t/200+i)*4);c.lineTo(xx-12,-18)}c.closePath();c.fill();c.strokeStyle=OUT;c.lineWidth=1.4;c.stroke();
   rr(c,-20,-94,40,38,10);fs(c,'#7a2630');c.fillStyle='#9a3642';rr(c,-17,-92,34,10,6);c.fill();
   glow(c,0,-74,18+Math.sin(t/250)*3,'#ff7a4a',.7);c.fillStyle='#ffd27a';circ(c,0,-74,4.2);
@@ -1445,7 +1442,6 @@ function drawArch(c,B,t){
   c.strokeStyle='#7a2630';c.lineWidth=8;c.lineCap='round';c.beginPath();c.moveTo(-20,-86);c.lineTo(-33,-66);c.stroke();glow(c,-34,-64,10+(sp>=0?8:0),'#ff7a4a',.6);
   c.beginPath();c.arc(0,-104,11,0,TAU);fs(c,'#2a1218');c.fillStyle='#ffd27a';c.fillRect(-6.5,-106,4.5,3);c.fillRect(2,-106,4.5,3);glow(c,0,-105,12,'#ffb04a',.4);
   c.fillStyle='#d8c9b0';for(const s of[-1,1])tri(c,s*6,-112,s*14,-129,s*10.5,-108);
-  glow(c,0,-131,22,'#e2b24c',.4);c.strokeStyle='#e2b24c';c.lineWidth=3.5;c.beginPath();c.ellipse(0,-131,17,5.5,0,.5,5.4);c.stroke();
   const a0=-2.5,sa=sp>=0?a0+sp*3.1:-1+Math.sin(t/700)*.08;
   if(sp>=0){c.globalAlpha=(1-sp)*.7;c.strokeStyle='#ff9a5a';c.lineWidth=9;c.beginPath();c.arc(20,-86,66,a0,a0+sp*3.1);c.stroke();c.globalAlpha=1}
   c.save();c.translate(20,-86);c.rotate(sa);c.strokeStyle='#7a2630';c.lineWidth=8;c.beginPath();c.moveTo(0,0);c.lineTo(14,0);c.stroke();c.fillStyle='#e2b24c';c.fillRect(13,-8,4.5,16);
