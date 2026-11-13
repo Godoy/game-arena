@@ -579,7 +579,7 @@ function stats(){const c=CLS[H.cls],l=H.lv-1,a=H.attr;
   H.arm=c.arm+2*H.up.armor+.3*l+6*rl('heart');H.spd=c.spd*(1+.06*H.up.boots+.05*tr('spd')+.01*a.agi+.15*rl('wings')+.25*rl('myth'));
   H.itv=c.itv/(1+.1*H.up.gloves+.08*tr('aspd')+.03*a.agi+.2*rl('wings')+.25*rl('myth'));H.range=c.range}
 function newHero(){H={kind:'me',r:13,cls:P.cls,x:0,y:0,face:0,lv:1,xp:0,gold:0,evo:0,kills:0,kgl:0,streak:0,mk:0,deaths:0,hp:1,mhp:1,atk:0,cd1:0,cd2:0,pot:0,dead:false,respawnAt:0,inv:0,
-  up:{blade:0,armor:0,gloves:0,boots:0},tal:{},attr:{str:0,vit:0,agi:0},rel:{},tp:0,tD:0,tH:0,fury:0,haste:0,wrath:0,slow:0,chill:0,root:0,boomN:0,boomT:0,free:0,leech:0,curse:0,bless:0,port:0,pull:null,tw:null,twAt:0,pk:0,aegisCd:0,phxCd:0,hurtAt:-1e9,target:null,sel:0,
+  up:{blade:0,armor:0,gloves:0,boots:0},tal:{},attr:{str:0,vit:0,agi:0},rel:{},tp:0,tD:0,tH:0,fury:0,haste:0,wrath:0,slow:0,chill:0,root:0,boomN:0,boomT:0,free:0,leech:0,curse:0,bless:0,port:0,pull:null,dash:null,tw:null,twAt:0,pk:0,aegisCd:0,phxCd:0,hurtAt:-1e9,target:null,sel:0,
   walk:0,mv:0,sw:0,swD:.25,ct:0,ctD:.4,ck:0,flash:0,bf:0,col:'#f6e3a1'};stats();H.hp=H.mhp}
 /* Eventos: a agenda e os lugares saem da semente, então são iguais em todos os aparelhos.
    Altar (pares) e Baú Amaldiçoado (ímpares) a cada 2 min, nunca na tempestade. Portais: um par fixo nos mapas médio e grande. */
@@ -759,7 +759,7 @@ function mkZone(kind,x,y,mine,d,cap,a,own,ev){
 function shove(o,ang,L,hf,d,flag,dist){const ux=Math.cos(ang),uy=Math.sin(ang),px=o.x+ux*48,py=o.y+uy*48;
   each(t=>{const dx=t.x-o.x,dy=t.y-o.y,dd=Math.hypot(dx,dy)||1;if(dd>L+t.r)return;let da=Math.atan2(dy,dx)-ang;da=Math.atan2(Math.sin(da),Math.cos(da));if(Math.abs(da)>hf&&dd>40)return;
     const qx=dist?clamp(t.x+dx/dd*dist,TILE,WORLD-TILE):px,qy=dist?clamp(t.y+dy/dd*dist,TILE,WORLD-TILE):py;
-    if(t.kind==='creep'){const n=dist?Math.ceil(dist/8):Math.ceil(dd/8);for(let s2=0;s2<n&&Math.hypot(t.x-qx,t.y-qy)>t.r+6;s2++){const a2=Math.atan2(qy-t.y,qx-t.x);moveC(t,Math.cos(a2)*8,Math.sin(a2)*8,Math.min(t.r,14))}t.aggro=1}
+    if(t.kind==='creep'){const d0=Math.hypot(t.x-qx,t.y-qy);if(d0>t.r+6)t.kn={x:qx,y:qy,v:Math.max(420,d0/.32),t:.5};t.aggro=1}
     dealt(t,d,flag,false,t.kind==='hero'?[qx|0,qy|0]:null)})}
 function doSkill(o,cls,k,x,y,ang,mine,m,s1m,ev){ev=ev|0;
   if(cls===0){
@@ -818,7 +818,7 @@ function cast(i,am){const e=now();if(G.state!=='play'||!H||H.dead||e<0)return;if
   if(H.cls===4&&i)H.leech=e+4000+2000*tr('ult');
   if(H.cls===0){H.hp=Math.min(H.mhp,H.hp+H.mhp*(i?.2:H.evo===1?0:H.evo===2?.12:.07));if(!i){if(e<H.slow||e<H.chill||e<H.root)ftext(H.x,H.y-84,'purificado','#fff3c4');H.slow=0;H.chill=0;H.root=0;H.free=e+(H.evo===2?3000:2000);if(e<H.curse){H.curse=e+(H.curse-e)/2;ftext(H.x,H.y-98,'maldição encurtada','#fff3c4')}}if(i)H.wrath=e+6000+3000*tr('ult')}
   doSkill(H,H.cls,k,px,py,ang,true,outDmg(null,H.dmg),1+.2*tr('s1'),i?0:H.evo);
-  if(H.cls===1&&!i){burst(H.x,H.y-8,8,'#e2c79a',120,.35,3);const bx=-Math.cos(ang)*13,by=-Math.sin(ang)*13;for(let q=0;q<10;q++)moveC(H,bx,by,13)}
+  if(H.cls===1&&!i){burst(H.x,H.y-8,8,'#e2c79a',120,.35,3);H.dash={vx:-Math.cos(ang)*590,vy:-Math.sin(ang)*590,t:.22}}
   if(!i&&H.evo===2){if(H.cls===0)for(const a of G.allies)if(Math.hypot(a.x-H.x,a.y-H.y)<220)allyFx(a,9,8);if(H.cls===3)for(const a of G.allies)if(Math.hypot(a.x-H.x,a.y-H.y)<240)allyFx(a,8,0)}
   if(H.cls===3&&i){H.tw=null;for(let j=G.zones.length-1;j>=0;j--)if(G.zones[j].kind==='tornado'&&G.zones[j].mine){H.tw=G.zones[j];break}H.twAt=e+350}
   lastSkill=[++sseq,px|0,py|0,Math.round(ang*100),i?k:H.evo?H.evo+2:0];pushPresence();hud()}
@@ -922,9 +922,10 @@ function update(dt,t){
   if(e>=S0()&&!G.stormSaid){G.stormSaid=true;toast('A tempestade começou a fechar a arena. Vá para o centro')}
   /* herói */
   tickAnim(H,dt);H.bf=(e<H.fury?1:0)|(e<H.haste?2:0)|(e<H.inv?4:0)|(e<H.wrath?8:0)|(e<H.curse?16:0)|(e<H.bless?32:0)|(e<H.root?64:0);
-  if(H.dead){H.mv=0;if(e>=H.respawnAt){H.dead=false;H.x=G.spawn.x;H.y=G.spawn.y;H.hp=H.mhp;H.inv=e+3000;H.slow=0;H.chill=0;H.root=0;H.pull=null;respawnFx(H.x,H.y)}}
+  if(H.dead){H.mv=0;if(e>=H.respawnAt){H.dead=false;H.x=G.spawn.x;H.y=G.spawn.y;H.hp=H.mhp;H.inv=e+3000;H.slow=0;H.chill=0;H.root=0;H.pull=null;H.dash=null;respawnFx(H.x,H.y)}}
   else{
-    if(H.pull){const P2=H.pull,d=Math.hypot(P2.x-H.x,P2.y-H.y);P2.t-=dt;if(d<20||P2.t<=0)H.pull=null;else{const st=Math.min(d,1400*dt),a=Math.atan2(P2.y-H.y,P2.x-H.x);moveC(H,Math.cos(a)*st,Math.sin(a)*st,13);if(Math.random()<.6)part(H.x,H.y-24,0,0,.25,4,'#ff4a4a')}}
+    if(H.dash){const D=H.dash,st=Math.min(D.t,dt);moveC(H,D.vx*st,D.vy*st,13);D.t-=dt;if(D.t<=0)H.dash=null;if(Math.random()<.7)part(H.x,H.y-3,0,-14,.3,2.6,'#6e665c')}
+    if(H.pull){const P2=H.pull,d=Math.hypot(P2.x-H.x,P2.y-H.y);P2.t-=dt;if(d<20||P2.t<=0)H.pull=null;else{const st=Math.min(d,800*dt),a=Math.atan2(P2.y-H.y,P2.x-H.x);moveC(H,Math.cos(a)*st,Math.sin(a)*st,13);if(Math.random()<.6)part(H.x,H.y-24,0,0,.25,4,'#ff4a4a')}}
     const[ix,iy]=inputVec(),sp=H.spd*(G.mod===3?1.3:1)*(e<H.haste?1.4:1)*(e<H.bless?1.15:1)*(e<H.root?0:e<H.slow?.6:e<H.chill?.8:1),ox=H.x,oy=H.y;
     if(ix||iy){moveC(H,ix*sp*dt,iy*sp*dt,13);if(!H.target)H.face=Math.atan2(iy,ix)}
     const dm=Math.hypot(H.x-ox,H.y-oy);H.walk+=dm*.085;H.mv+=((dm>.2?1:0)-H.mv)*Math.min(1,dt*12);
@@ -943,7 +944,7 @@ function update(dt,t){
   }
   if(G.state==='play')evTick(e,dt);
   /* criaturas */
-  for(const c of G.creeps){if(!c.alive)continue;const T=MON[c.kd];c.atk-=dt;tickAnim(c,dt);if(c.born>0)c.born-=dt;if(c.slow>0)c.slow-=dt;if(c.chill>0)c.chill-=dt;if(c.root>0)c.root-=dt;
+  for(const c of G.creeps){if(!c.alive)continue;const T=MON[c.kd];c.atk-=dt;tickAnim(c,dt);if(c.born>0)c.born-=dt;if(c.slow>0)c.slow-=dt;if(c.chill>0)c.chill-=dt;if(c.root>0)c.root-=dt;if(c.kn){const K=c.kn,d=Math.hypot(K.x-c.x,K.y-c.y);K.t-=dt;if(d<=c.r+6||K.t<=0)c.kn=null;else{const st=Math.min(d,K.v*dt),a=Math.atan2(K.y-c.y,K.x-c.x);moveC(c,Math.cos(a)*st,Math.sin(a)*st,Math.min(c.r,14));if(Math.random()<.5)part(c.x,c.y-3,0,-12,.3,2.4,'#6e665c')}}
     const dh=Math.hypot(c.x-c.hx,c.y-c.hy),ox=c.x,oy=c.y,spd=T.spd*(c.root>0?0:c.slow>0?.5:c.chill>0?.75:1);
     if(c.back){if(dh<8){c.back=false;c.aggro=0;c.x=c.hx;c.y=c.hy}else{const a=Math.atan2(c.hy-c.y,c.hx-c.x);c.face=a;c.x+=Math.cos(a)*T.spd*1.5*dt;c.y+=Math.sin(a)*T.spd*1.5*dt;c.hp=Math.min(c.mhp,c.hp+c.mhp*.3*dt)}}
     else if(dh>350)c.back=true;
@@ -1109,8 +1110,8 @@ function netRead(){
       if(inM&&myPeer&&h[1]===myPeer&&(num(h[3])|0)>=7){if(ally(o)&&!H.dead){const e2=now();
           if(h[3]===9){const v=H.mhp*clamp(num(h[2]),0,30)/100;H.hp=Math.min(H.mhp,H.hp+v);H.slow=0;H.chill=0;H.root=0;H.free=Math.max(H.free,e2+2000);ftext(H.x,H.y-84,'+'+Math.round(v),'#74c365');fx('ring',H.x,H.y,{r:46,T:.45,col:'#74c365'});burst(H.x,H.y-24,10,'#fff3c4',90,.7,3.5,0,-90)}
           else if(h[3]===8){H.haste=Math.max(H.haste,e2+3000);ftext(H.x,H.y-84,'vento a favor','#bfeee4');fx('gust',H.x,H.y,{a:H.face,r:80,half:1,T:.4})}}}
-      else if(inM&&myPeer&&h[1]===myPeer&&!ally(o)){hurt(clamp(num(h[2]),0,9000),o.peer,false,false,h[3]===1?1:h[3]===2?2:0);
-        if(h.length>5&&!H.dead&&now()>=H.inv&&now()>=H.free){const tx=clamp(num(h[4]),0,WORLD),ty=clamp(num(h[5]),0,WORLD);if(Math.hypot(tx-H.x,ty-H.y)<420)H.pull={x:tx,y:ty,t:.22}}}}
+      else if(inM&&myPeer&&h[1]===myPeer&&!ally(o)){hurt(clamp(num(h[2]),0,9000),o.peer,false,false,h[3]===1?1:h[3]===2?2:h[3]===3?3:0);
+        if(h.length>5&&!H.dead&&now()>=H.inv&&now()>=H.free){const tx=clamp(num(h[4]),0,WORLD),ty=clamp(num(h[5]),0,WORLD);if(Math.hypot(tx-H.x,ty-H.y)<420)H.pull={x:tx,y:ty,t:.42}}}}
     if(Array.isArray(s.dk)&&num(s.dk[0])>o.dseq){o.dseq=num(s.dk[0]);
       if(inM){G.dying.push({hero:{...o,sw:0,ct:0,bf:0},t:0,T:.6});burst(o.x,o.y-24,14,'#f2ead8',130,.7,4,3,60);
         if(myPeer&&s.dk[1]===myPeer){const vl=clamp(num(s.dk[2],1)|0,1,LVMAX),vs=clamp(num(s.dk[3])|0,0,20),w=Date.now(),rec=G.farm.get(o.peer)||{n:0,t:0};if(w-rec.t>90000)rec.n=0;
