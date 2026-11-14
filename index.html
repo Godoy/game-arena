@@ -90,6 +90,7 @@ button{font:inherit;color:inherit;touch-action:manipulation;cursor:pointer}
 .mchip .mc1{display:flex;justify-content:space-between;gap:8px}.mchip b{color:var(--gold);font:800 13px var(--ui)}.mchip .xbar{display:block;margin:0}.mchip .mb-m{color:var(--muted);font:600 11px var(--ui)}
 #menu .heroes{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}#menu .heroes label{padding:4px 2px 6px;gap:1px}#menu .heroes label canvas{width:100%;max-width:58px;height:auto}#menu .heroes label b{font-size:11px;line-height:1.15}#menu .heroes label span{display:none}
 #menu .heroes label.locked::after{content:'300';font-size:10px}
+#menu .nickrow{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px}#menu .nickrow .label{margin:0}#menu .nickrow input{padding-top:8px;padding-bottom:8px}
 
 .pf-head{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pf-box{display:grid;gap:6px;align-content:start;padding:10px;border:1px solid var(--line);border-radius:10px}.pf-box b{font:800 16px var(--ui);color:var(--gold)}.pf-box .xbar{margin:0}
 .pf-box small,.pf-hero small,.pf-tip{font:600 11.5px/1.35 var(--ui);color:var(--muted);margin:0}
@@ -307,6 +308,10 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
   <section id="menu" class="sheet" aria-labelledby="t-menu">
     <div class="inner">
       <div class="mtop"><h1 id="t-menu">Arena Nexus</h1><button class="mchip" id="b-prof" type="button" aria-label="Perfil e missões"><span class="mc1"><b id="mb-lv"></b><span id="mb-c"></span></span><span class="xbar"><i id="mb-x"></i></span><span class="mb-m" id="mb-m"></span></button></div>
+      <div class="field nickrow">
+        <label class="label" for="nick">Seu nome na arena</label>
+        <input id="nick" type="text" maxlength="12" autocomplete="off" spellcheck="false">
+      </div>
       <div class="field">
         <span class="label" id="l-hero">Herói</span>
         <div class="heroes" role="radiogroup" aria-labelledby="l-hero">
@@ -381,10 +386,6 @@ h2{margin:0;font:800 34px/1 var(--display);color:var(--gold);text-wrap:balance}
       </details>
       <button class="go" id="b-go" type="button">Jogar sozinho</button>
       <p class="note" id="go-note"></p>
-      <div class="field">
-        <label class="label" for="nick">Seu nome na arena</label>
-        <input id="nick" type="text" maxlength="12" autocomplete="off" spellcheck="false">
-      </div>
       <div class="friends" id="room-ctl">
         <span class="label">Ou jogue com amigos</span>
         <button class="alt" id="b-host" type="button">Criar sala</button>

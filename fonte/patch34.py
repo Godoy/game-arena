@@ -1,5 +1,5 @@
 # v1: (1) puxão em heróis mais firme e visível; (2) ranking final guarda quem já saiu; (3) pedra quebra com 3 a 5 picaretadas;
-# (4) página inicial enxuta: título + cartão de perfil numa linha, heróis em grade compacta de 5 colunas, nome do jogador mais abaixo.
+# (4) página inicial enxuta: título + cartão de perfil numa linha, heróis em grade compacta de 5 colunas, nome do jogador numa linha logo abaixo do título.
 s=open('index.html',encoding='utf-8').read();t=open('site/index.html',encoding='utf-8').read()
 CSS=r"""
 .mtop{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -8,6 +8,7 @@ CSS=r"""
 .mchip .mc1{display:flex;justify-content:space-between;gap:8px}.mchip b{color:var(--gold);font:800 13px var(--ui)}.mchip .xbar{display:block;margin:0}.mchip .mb-m{color:var(--muted);font:600 11px var(--ui)}
 #menu .heroes{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}#menu .heroes label{padding:4px 2px 6px;gap:1px}#menu .heroes label canvas{width:100%;max-width:58px;height:auto}#menu .heroes label b{font-size:11px;line-height:1.15}#menu .heroes label span{display:none}
 #menu .heroes label.locked::after{content:'300';font-size:10px}
+#menu .nickrow{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px}#menu .nickrow .label{margin:0}#menu .nickrow input{padding-top:8px;padding-bottom:8px}
 """
 def patch(s):
     def rep(a,b,n=1):
@@ -26,8 +27,7 @@ def patch(s):
     # 4) página inicial
     a=s.index('<h1 id="t-menu">');b=s.index('<div class="field">\n        <label class="label" for="nick">');c=s.index('<div class="field">\n        <span class="label" id="l-hero">')
     nick=s[b:c].rstrip()
-    s=s[:a]+'<div class="mtop"><h1 id="t-menu">Arena Nexus</h1><button class="mchip" id="b-prof" type="button" aria-label="Perfil e missões"><span class="mc1"><b id="mb-lv"></b><span id="mb-c"></span></span><span class="xbar"><i id="mb-x"></i></span><span class="mb-m" id="mb-m"></span></button></div>\n      '+s[c:]
-    rep('<div class="friends" id="room-ctl">',nick+'\n      <div class="friends" id="room-ctl">')
+    s=s[:a]+'<div class="mtop"><h1 id="t-menu">Arena Nexus</h1><button class="mchip" id="b-prof" type="button" aria-label="Perfil e missões"><span class="mc1"><b id="mb-lv"></b><span id="mb-c"></span></span><span class="xbar"><i id="mb-x"></i></span><span class="mb-m" id="mb-m"></span></button></div>\n      '+nick.replace('<div class="field">','<div class="field nickrow">',1)+'\n      '+s[c:]
     rep("$('mb-m').textContent='Missões de hoje: '+dn+'/3'+(M.day.first?'':' · primeira partida do dia vale +50% de experiência')","$('mb-m').textContent='Missões '+dn+'/3'+(M.day.first?'':' · bônus do dia')+' · ver perfil'")
     rep(".pf-foot{",CSS+".pf-foot{")
     return s
