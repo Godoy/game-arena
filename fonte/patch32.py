@@ -19,13 +19,16 @@ CSS=r"""
 """
 JS=r"""/* ---------- progresso entre partidas (salvo no aparelho) ---------- */
 const MK='arena-nexus-meta';let MT=null;
+/* quem já tinha o jogo salvo antes de existirem heróis bloqueados mantém todos (lido antes de o jogo gravar qualquer coisa) */
+const OLDP=(()=>{try{return!!localStorage.getItem('arena-celeste')}catch(_){return false}})();
 const MLV=x=>{let l=1;while(x>=100+50*(l-1)){x-=100+50*(l-1);l++}return[l,x,100+50*(l-1)]};
 const HLV=x=>{let l=0;while(x>=150*(l+1)){x-=150*(l+1);l++}return[l,x,150*(l+1)]};
 const MTIT=[[16,'Lenda'],[12,'Mestre'],[8,'Especialista'],[5,'Veterano'],[3,'Aprendiz'],[1,'Iniciado'],[0,'Novato']],mtit=l=>MTIT.find(a=>l>=a[0])[1];
 const CHN=['Baú Comum','Baú Raro','Baú Épico','Baú Mítico'],CHC=['#c9cedb','#63c7d6','#c58cf0','#ffd27a'];
 function metaLoad(){if(MT)return MT;let s={};try{s=JSON.parse(localStorage.getItem(MK)||'{}')||{}}catch(_){}
   const ob=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
-  MT={xp:Math.max(0,num(s.xp)|0),coins:Math.max(0,num(s.coins)|0),hx:Array.isArray(s.hx)?s.hx.map(v=>Math.max(0,num(v)|0)):[],rec:ob(s.rec),tot:ob(s.tot),ach:ob(s.ach),day:ob(s.day),week:ob(s.week)};return MT}
+  MT={xp:Math.max(0,num(s.xp)|0),coins:Math.max(0,num(s.coins)|0),hx:Array.isArray(s.hx)?s.hx.map(v=>Math.max(0,num(v)|0)):[],rec:ob(s.rec),tot:ob(s.tot),ach:ob(s.ach),day:ob(s.day),week:ob(s.week),own:ob(s.own),eq:Array.isArray(s.eq)?s.eq:[],un:Array.isArray(s.un)?s.un.filter(v=>v>=0&&v<CLS.length):null};
+  if(!MT.un){MT.un=OLDP||MT.xp>0?CLS.map((_,i)=>i):[0,1,2,3];metaSave()}return MT}
 function metaSave(){try{localStorage.setItem(MK,JSON.stringify(MT))}catch(_){}}
 const dayKey=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()},weekKey=()=>{const d=new Date();return Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5+3)/7)};
 const DPOOL=[{k:'mk',n:40,t:'Derrote 40 criaturas'},{k:'bk',n:2,t:'Derrote 2 chefes'},{k:'ch',n:5,t:'Abra 5 baús'},{k:'pl',n:2,t:'Jogue 2 partidas'},{k:'lv',n:10,mx:1,t:'Chegue ao nível 10 em uma partida'},{k:'gl',n:400,mx:1,t:'Faça 400 de glória em uma partida'},{k:'hero',n:1,t:'Jogue uma partida com '}];

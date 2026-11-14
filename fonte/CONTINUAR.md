@@ -41,6 +41,9 @@ addhero.py / addart.sh leem os blobs de /tmp/claude-tool-results/*/ (imagens tra
 - patch32: progresso entre partidas no aparelho (localStorage 'arena-nexus-meta'): conta com nível, maestria por herói, 3 missões do dia + 1 da semana, baú de fim de partida (moedas, 4 raridades), recordes, 12 conquistas, tela Perfil. Sem punição por faltar (só +50% na 1ª partida do dia). Gancho de teste: window.__end() no site/.
 - PRÓXIMA RODADA combinada: loja para gastar moedas (skins/títulos), heróis a desbloquear (sem tirar os que o jogador já usa), desafio do dia com semente fixa, nível da conta ao lado do nome na sala, modo ondas.
 
+- patch33: Zero virou herói de longe e frágil (400 de vida, alcance 200, bombinha com estilhaço de 40% em volta); Grude com braços curvados no abraço (bf 1024; apertos a cada 0,6 s) e efeito 'bite'; loja de visuais no Perfil (Eco 250, Prisma 400: paleta do herói com matiz girado, skinOf); heróis a liberar por 300 moedas (jogador novo começa com 4; quem já tinha save mantém os 9; OLDP); nível da conta na lista da sala (al) e visual equipado enviado na presença (sk).
+- Falta da rodada: desafio do dia com semente fixa.
+
 ## Ideias ainda não feitas
 - Caçadora: companheiro animal domado (ideia do dono, não feita).
 - Versão simples: redesenhar criaturas uma a uma; dar o mesmo movimento aos chefes; capa e cabelo dos heróis reagindo mais.
