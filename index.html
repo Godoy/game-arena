@@ -90,6 +90,18 @@ button{font:inherit;color:inherit;touch-action:manipulation;cursor:pointer}
 .mchip .mc1{display:flex;justify-content:space-between;gap:8px}.mchip b{color:var(--gold);font:800 13px var(--ui)}.mchip .xbar{display:block;margin:0}.mchip .mb-m{color:var(--muted);font:600 11px var(--ui)}
 #menu .heroes{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}#menu .heroes label{padding:4px 2px 6px;gap:1px}#menu .heroes label canvas{width:100%;max-width:58px;height:auto}#menu .heroes label b{font-size:11px;line-height:1.15}#menu .heroes label span{display:none}
 #menu .heroes label.locked::after{content:'300';font-size:10px}
+
+.pf-head{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pf-box{display:grid;gap:6px;align-content:start;padding:10px;border:1px solid var(--line);border-radius:10px}.pf-box b{font:800 16px var(--ui);color:var(--gold)}.pf-box .xbar{margin:0}
+.pf-box small,.pf-hero small,.pf-tip{font:600 11.5px/1.35 var(--ui);color:var(--muted);margin:0}
+.pf-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.pf-tabs button{padding:10px 4px;font:800 12px var(--ui);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:8px}.pf-tabs button.on{color:var(--gold-ink);background:var(--gold);border-color:var(--gold)}
+.pf-hero{display:grid;gap:6px;padding:10px;border:1px solid var(--line);border-radius:10px}.pf-hero.lock{border-style:dashed}.pf-hero .pf-sk{justify-content:flex-start;align-items:center}.pf-hero>button{width:auto;justify-self:start;padding:7px 10px;font-size:12px;min-height:0}.pf-hero>button:disabled{opacity:.5}
+.pf-rw{grid-column:1/-1;font:700 11px var(--ui);color:var(--gold)}
+#room-list.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0}
+#room-list.teams>li.tcol{display:grid;gap:5px;align-content:start;padding:8px;border:1px solid var(--line);border-radius:8px;background:transparent;list-style:none;font:600 13px var(--ui);color:var(--ink)}
+#room-list.teams>li.tcol>b{font:800 13px var(--ui);letter-spacing:.06em;text-transform:uppercase}#room-list.teams>li.t0>b{color:#ffd27a}#room-list.teams>li.t1>b{color:#7fb4ff}
+#room-list.teams>li.t0.mine{border-color:#ffd27a}#room-list.teams>li.t1.mine{border-color:#7fb4ff}
+#room-list.teams>li.tcol>span.you{font-weight:800}#room-list.teams>li.tcol>small{color:var(--muted);font:600 11px var(--ui)}
+#room-list.teams>li.tcol>button{margin-top:2px;padding:6px 8px;font:700 12px var(--ui);color:var(--ink);background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:6px}
 .pf-foot{position:sticky;bottom:-14px;margin:0 -14px -14px;padding:10px 14px;background:var(--stone);border-top:1px solid var(--line);display:flex;justify-content:flex-end}
 #end-meta{display:grid;gap:8px;margin:4px 0 10px;padding:12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);font:600 13px var(--ui);color:var(--ink)}#end-meta:empty{display:none}
 #end-meta b{color:var(--gold)}#end-meta .em-ch{display:flex;align-items:center;gap:10px}#end-meta .em-ch button{flex:none}
@@ -1094,7 +1106,7 @@ function metaEnd(){if(!H||G.metaMid===G.mid)return;G.metaMid=G.mid;const M=metaM
   const R=M.rec[H.cls]||(M.rec[H.cls]={gl:0,lv:0,mk:0});let nr=false;if(gl>R.gl){nr=R.gl>0;R.gl=gl}if(H.lv>R.lv)R.lv=H.lv;if(st.mk>R.mk)R.mk=st.mk;
   const T=M.tot;T.pl=(T.pl|0)+1;T.win=(T.win|0)+(win?1:0);T.bk=(T.bk|0)+st.bk;T.ch=(T.ch|0)+st.ch;T.mk=(T.mk|0)+st.mk;
   const na=[];for(const a of ACH)if(!M.ach[a.id]&&a.c(M,{lv:H.lv,gl,chest:ch[0]})){M.ach[a.id]=1;na.push(a.t)}
-  metaSave();const l1=MLV(M.xp)[0],h1=HLV(M.hx[H.cls])[0];metaEndUI({xp,first,ch,done,lu:l1>l0?l1:0,hu:h1>h0?h1:0,nr,na,cls:H.cls})}
+  const l1=MLV(M.xp)[0],h1=HLV(M.hx[H.cls])[0];if(l1>l0)M.coins+=50*(l1-l0);metaSave();metaEndUI({xp,first,ch,done,lu:l1>l0?l1:0,hu:h1>h0?h1:0,nr,na,cls:H.cls})}
 /* visuais (variações de cor) e heróis liberados */
 const SKC={},SKN=[['Padrão',0],['Eco',250],['Prisma',400]],HPRICE=300;
 function hueShift(hex,deg){let r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;let h=0,sa=0;
@@ -1114,26 +1126,40 @@ function metaEndUI(R){const box=$('end-meta'),M=MT,L=MLV(M.xp);box.textContent='
   const lv=metaEl('div');lv.append('Conta nível '+L[0]+' ('+L[1]+'/'+L[2]+')',metaBar(L[1],L[2]));box.appendChild(lv);
   const cw=metaEl('div',null,'em-ch'),bt=metaEl('button','Abrir baú','alt'),out=metaEl('span','Você ganhou um baú.');bt.type='button';cw.append(bt,out);box.appendChild(cw);
   bt.addEventListener('click',()=>{bt.remove();out.textContent='';const n=metaEl('b',CHN[R.ch[0]]);n.style.color=CHC[R.ch[0]];out.append(n,': +'+R.ch[1]+' moedas (total '+M.coins+')');out.className='em-pop'});
-  if(R.lu)box.appendChild(metaEl('div','Sua conta subiu para o nível '+R.lu+'!'));
+  if(R.lu)box.appendChild(metaEl('div','Sua conta subiu para o nível '+R.lu+'! +50 moedas.'));
   if(R.hu)box.appendChild(metaEl('div','Maestria de '+CLS[R.cls].n+' subiu para '+R.hu+' ('+mtit(R.hu)+').'));
   if(R.nr)box.appendChild(metaEl('div','Novo recorde de glória com '+CLS[R.cls].n+'!'));
   for(const d of R.done)box.appendChild(metaEl('div','Missão concluída: '+d));
   for(const d of R.na)box.appendChild(metaEl('div','Conquista: '+d))}
 function metaMenu(){const M=metaMissions(),L=MLV(M.xp),dn=M.day.ms.filter(m=>m.d).length;$('mb-lv').textContent='Nível '+L[0];$('mb-c').textContent=M.coins+' moedas';$('mb-x').style.width=Math.round(L[1]/L[2]*100)+'%';
   metaLock();$('mb-m').textContent='Missões '+dn+'/3'+(M.day.first?'':' · bônus do dia')+' · ver perfil'}
-function metaProf(on){const P2=$('prof');P2.hidden=!on;if(!on)return;const M=metaMissions(),L=MLV(M.xp),B=$('pf-body');B.textContent='';
-  const row=(a,b,v,n,ok)=>{const r=metaEl('div',null,'pf-row'+(ok?' ok':''));r.append(metaEl('span',a),metaEl('small',b));if(n)r.appendChild(metaBar(v,n));return r};
-  B.appendChild(row('Conta nível '+L[0],M.coins+' moedas',L[1],L[2]));
-  B.appendChild(metaEl('h3','Missões de hoje'));for(const m of M.day.ms)B.appendChild(row(m.t,m.d?'concluída':Math.min(m.p,m.n)+'/'+m.n+' · 40 exp, 30 moedas',m.p,m.n,m.d));
-  B.appendChild(metaEl('h3','Missão da semana'));for(const m of M.week.ms)B.appendChild(row(m.t,m.d?'concluída':Math.min(m.p,m.n)+'/'+m.n+' · 200 exp, 150 moedas',m.p,m.n,m.d));
-  B.appendChild(metaEl('h3','Maestria e recordes por herói'));CLS.forEach((C,i)=>{const h=HLV(M.hx[i]|0),R=M.rec[i];B.appendChild(row(C.n+' · '+mtit(h[0])+' '+h[0],R?'recorde: '+R.gl+' de glória, nível '+R.lv:'ainda não jogou',h[1],h[2]))});
-  metaShop(B,M);const T=M.tot;B.appendChild(metaEl('h3','Totais'));B.appendChild(row((T.pl|0)+' partidas, '+(T.win|0)+' vitórias contra amigos',(T.bk|0)+' chefes · '+(T.ch|0)+' baús · '+(T.mk|0)+' criaturas'));
-  B.appendChild(metaEl('h3','Conquistas ('+ACH.filter(a=>M.ach[a.id]).length+'/'+ACH.length+')'));const g=metaEl('div',null,'pf-ach');for(const a of ACH)g.appendChild(metaEl('span',a.t,M.ach[a.id]?'on':''));B.appendChild(g)}
+let PFT=0;
+function metaProf(on,tab){const P2=$('prof');P2.hidden=!on;if(!on)return;if(tab!=null)PFT=tab;const M=metaMissions(),L=MLV(M.xp),B=$('pf-body');B.textContent='';
+  const row=(a,b,v,n,ok,rw)=>{const r=metaEl('div',null,'pf-row'+(ok?' ok':''));r.append(metaEl('span',a),metaEl('small',b));if(n)r.appendChild(metaBar(v,n));if(rw&&!ok)r.appendChild(metaEl('span','Recompensa: '+rw,'pf-rw'));return r};
+  const head=metaEl('div',null,'pf-head'),c1=metaEl('div',null,'pf-box'),c2=metaEl('div',null,'pf-box');
+  c1.append(metaEl('b','Nível '+L[0]),metaBar(L[1],L[2]),metaEl('small','Faltam '+(L[2]-L[1])+' de experiência para o nível '+(L[0]+1)+'. Cada nível novo dá 50 moedas.'));
+  c2.append(metaEl('b',M.coins+' moedas'),metaEl('small','Servem para liberar heróis ('+HPRICE+') e comprar visuais (250 ou 400), na aba Heróis.'));head.append(c1,c2);B.appendChild(head);
+  const tabs=metaEl('div',null,'pf-tabs');['Missões','Heróis','Conquistas'].forEach((n,i)=>{const b=metaEl('button',n,i===PFT?'on':'');b.type='button';b.addEventListener('click',()=>metaProf(true,i));tabs.appendChild(b)});B.appendChild(tabs);
+  if(PFT===0){B.appendChild(metaEl('p','Toda partida jogada até o fim dá experiência e um baú de moedas, e conta para as missões. Elas se concluem sozinhas.','pf-tip'));
+    B.appendChild(metaEl('h3','Missões de hoje'));for(const m of M.day.ms)B.appendChild(row(m.t,m.d?'concluída':Math.min(m.p,m.n)+' de '+m.n,m.p,m.n,m.d,'40 de experiência e 30 moedas'));
+    B.appendChild(metaEl('h3','Missão da semana'));for(const m of M.week.ms)B.appendChild(row(m.t,m.d?'concluída':Math.min(m.p,m.n)+' de '+m.n,m.p,m.n,m.d,'200 de experiência e 150 moedas'));
+    B.appendChild(metaEl('p',M.day.first?'Bônus do dia já usado: sua primeira partida de hoje valeu 50% a mais de experiência.':'Bônus do dia disponível: sua próxima partida vale 50% a mais de experiência.','pf-tip'))}
+  else if(PFT===1){B.appendChild(metaEl('p','Jogar com um herói aumenta a maestria dele. Use moedas para liberar heróis e trocar o visual.','pf-tip'));
+    CLS.forEach((C,i)=>{const h=HLV(M.hx[i]|0),R=M.rec[i],ok=metaOk(i),card=metaEl('div',null,'pf-hero'+(ok?'':' lock')),top=metaEl('div',null,'pf-row');
+      top.append(metaEl('span',C.n),metaEl('small',ok?'Maestria '+h[0]+' · '+mtit(h[0]):'Bloqueado'));card.appendChild(top);
+      if(ok){card.appendChild(metaBar(h[1],h[2]));card.appendChild(metaEl('small',R?'Recorde: '+R.gl+' de glória, nível '+R.lv+' na partida':'Você ainda não jogou com este herói.'));
+        const w=metaEl('div',null,'pf-sk');w.appendChild(metaEl('small','Visual:'));SKN.forEach(([nm,pr],k)=>{const own=!k||!!M.own[i+'_'+k],eq=metaSkin(i)===k,bt=metaEl('button',eq?nm+' (em uso)':own?nm:nm+' · '+pr+' moedas','alt'+(eq?' on':''));bt.type='button';bt.disabled=!own&&M.coins<pr;
+          bt.addEventListener('click',()=>{if(!own){if(M.coins<pr)return;M.coins-=pr;M.own[i+'_'+k]=1}while(M.eq.length<CLS.length)M.eq.push(0);M.eq[i]=k;metaSave();metaMenu();metaProf(true);pushPresence()});w.appendChild(bt)});card.appendChild(w)}
+      else{card.appendChild(metaEl('small',C.s1.n+' e '+C.s2.n+'.'));const bt=metaEl('button',M.coins<HPRICE?'Liberar · faltam '+(HPRICE-M.coins)+' moedas':'Liberar por '+HPRICE+' moedas','alt');bt.type='button';bt.disabled=M.coins<HPRICE;
+        bt.addEventListener('click',()=>{if(M.coins<HPRICE)return;M.coins-=HPRICE;M.un.push(i);metaSave();metaMenu();metaProf(true)});card.appendChild(bt)}
+      B.appendChild(card)})}
+  else{const T=M.tot;B.appendChild(metaEl('h3','Seus números'));B.appendChild(row((T.pl|0)+((T.pl|0)===1?' partida · ':' partidas · ')+(T.win|0)+((T.win|0)===1?' vitória contra amigos':' vitórias contra amigos'),''));B.appendChild(row((T.bk|0)+' chefes · '+(T.ch|0)+' baús · '+(T.mk|0)+' criaturas',''));
+    B.appendChild(metaEl('h3','Conquistas ('+ACH.filter(a=>M.ach[a.id]).length+' de '+ACH.length+')'));const g=metaEl('div',null,'pf-ach');for(const a of ACH)g.appendChild(metaEl('span',a.t,M.ach[a.id]?'on':''));B.appendChild(g)}}
 function endMatch(){setState('end');metaEnd();pushPresence();setTimeout(pushPresence,900);renderEnd();let n=0;const iv=setInterval(()=>{if(G.state!=='end'||++n>6)return clearInterval(iv);netRead();renderEnd()},1000)}
 
 /* ---------- rede: presença da sala, cada aparelho manda o próprio herói ---------- */
 function pack(){
-  if(G.state==='menu'||!H)return{n:P.name,al:MLV(metaLoad().xp)[0],sk:metaSkin(P.cls),c:P.cls,mid:'',e:0,cd:myCd?[myCd.mid,myCd.seed,myCd.du,myCd.sz,Math.max(0,Math.round(myCd.end-Date.now())),myCd.md,myCd.rl]:0,cx:cdX.slice(),tm:P.team};
+  if(G.state==='menu'||!H)return{n:P.name,pm:P.mode,al:MLV(metaLoad().xp)[0],sk:metaSkin(P.cls),c:P.cls,mid:'',e:0,cd:myCd?[myCd.mid,myCd.seed,myCd.du,myCd.sz,Math.max(0,Math.round(myCd.end-Date.now())),myCd.md,myCd.rl]:0,cx:cdX.slice(),tm:P.team};
   const e=now();
   return{n:P.name,al:MLV(metaLoad().xp)[0],sk:metaSkin(P.cls),c:P.cls,mid:G.mid,sd:G.seed,e:Math.round(e),x:Math.round(H.x),y:Math.round(H.y),f:Math.round(H.face*100),hp:Math.round(H.hp),mh:H.mhp,lv:H.lv,k:H.kills,mk:H.mk,du:G.dur/60000,sz:G.size,sp:G.spawnI,md:G.mode,rl:G.rules,tm:Math.max(0,G.team),dt:H.deaths,sc:glory(),
     st:H.dead?1:0,bf:H.bf,h:hits.slice(),dk:lastDeath,ck:[G.wave,...G.myCk],cc:[G.wave,...G.myCc],
@@ -1233,7 +1259,7 @@ function netRead(){
     o.cx=Array.isArray(s.cx)?s.cx.filter(m=>typeof m==='string').slice(0,6).map(m=>m.slice(0,8)):[];
     {const was=o.cx0;o.cx0=o.cx.join();if(was!==null&&G.state==='menu'&&o.cx.some(m=>!was.split(',').includes(m)))cdMsg={t:(s.n.slice(0,12)||'Alguém')+' pediu para esperar. A contagem foi cancelada.',until:Date.now()+5000}}
     o.cd=Array.isArray(s.cd)&&typeof s.cd[0]==='string'?{mid:s.cd[0].slice(0,8),seed:num(s.cd[1])>>>0,du:DURS.includes(s.cd[2])?s.cd[2]:10,sz:s.cd[3]===0||s.cd[3]===2?s.cd[3]:1,rem:clamp(num(s.cd[4]),0,15000),md:clamp(num(s.cd[5])|0,0,2),rl:s.cd[6]===1?1:0}:null;o.team=s.tm===1?1:0;
-    o.name=s.n.replace(/[\u0000-\u001f]/g,'').slice(0,12)||'Sem nome';o.cls=clamp(num(s.c)|0,0,CLS.length-1);o.al=clamp(num(s.al)|0,0,999);o.sk=clamp(num(s.sk)|0,0,2);
+    o.name=s.n.replace(/[\u0000-\u001f]/g,'').slice(0,12)||'Sem nome';o.cls=clamp(num(s.c)|0,0,CLS.length-1);o.al=clamp(num(s.al)|0,0,999);o.pm=clamp(num(s.pm)|0,0,2);o.sk=clamp(num(s.sk)|0,0,2);
     o.mid=typeof s.mid==='string'?s.mid.slice(0,8):'';o.seed=num(s.sd)>>>0;o.du=DURS.includes(s.du)?s.du:10;o.sz=s.sz===0||s.sz===2?s.sz:1;o.sp=s.sp>=0&&s.sp<8?s.sp|0:-1;o.md=clamp(num(s.md)|0,0,2);o.rl=s.rl===1?1:0;o.dur=o.du*60000;o.e=clamp(num(s.e),-10000,o.dur);o.face=clamp(num(s.f),-700,700)/100;
     o.tx=clamp(num(s.x),0,WORLD);o.ty=clamp(num(s.y),0,WORLD);if(!o.init||Math.hypot(o.tx-o.x,o.ty-o.y)>400){o.x=o.tx;o.y=o.ty;o.init=true}
     o.mh=Math.max(1,num(s.mh,1));o.hp=clamp(num(s.hp),0,o.mh);o.lv=clamp(num(s.lv,1)|0,1,LVMAX);o.k=num(s.k)|0;o.mk=num(s.mk)|0;o.dt=num(s.dt)|0;o.sc=num(s.sc)|0;{const wd=o.dead;o.dead=!!s.st;if(wd&&!o.dead&&s.mid===G.mid&&G.state==='play')respawnFx(clamp(num(s.x),0,WORLD),clamp(num(s.y),0,WORLD))}o.bf=num(s.bf)|0;
@@ -1967,7 +1993,11 @@ function refreshMenu(){
   if(wait)msg.textContent='Conectando…';
   else if(on){msg.textContent=!netUp()?'Sem conexão no momento, tentando reconectar…':list.length?'Na sala agora:':'Só você por enquanto. Toque em Convidar ou passe o código para seus amigos.';
     const add=(t,you)=>{const li=document.createElement('li');li.textContent=t;if(you)li.className='you';ul.appendChild(li)};
-    if(list.length){add(P.name+' (você) · nv. '+MLV(metaLoad().xp)[0]+' · '+TEAMS[P.team],true);list.forEach(o=>add(o.name+(o.al?' · nv. '+o.al:'')+' · '+TEAMS[o.team]+(o.mid&&Date.now()-o.at<4000&&o.e<o.dur?' · em partida':'')))}}
+    const tm=P.mode===1||list.some(o=>o.pm===1),inf=o=>o.name+(o.al?' · nv. '+o.al:'')+(o.mid&&Date.now()-o.at<4000&&o.e<o.dur?' · em partida':'');ul.classList.toggle('teams',tm);
+    if(tm){for(const k of[0,1]){const col=document.createElement('li');col.className='tcol t'+k+(P.team===k?' mine':'');const hd=document.createElement('b');hd.textContent='Time '+TEAMS[k];col.appendChild(hd);const mk=(tx,you)=>{const sp=document.createElement('span');sp.textContent=tx;if(you)sp.className='you';col.appendChild(sp)};let n=0;if(P.team===k){mk(P.name+' (você)',true);n++}list.forEach(o=>{if(o.team===k){mk(inf(o));n++}});if(!n){const sm=document.createElement('small');sm.textContent='ninguém ainda';col.appendChild(sm)}
+        if(P.team!==k){const bt=document.createElement('button');bt.type='button';bt.textContent='Ir para '+TEAMS[k];bt.addEventListener('click',()=>$('team'+k).click());col.appendChild(bt)}ul.appendChild(col)}}
+    else if(list.length){add(P.name+' (você) · nv. '+MLV(metaLoad().xp)[0],true);list.forEach(o=>add(inf(o)))}}
+  $('f-team').hidden=true;
   const cd=on?cdTick():null;
   $('opts').hidden=!!j||!!cd;$('opts-sum').textContent=P.dur+' min · mapa '+['pequeno','médio','grande'][P.size]+' · '+MODES[P.mode]+(P.rules?' · Caos':'');
   $('mode-note').textContent=[on?'Cada um por si. Vence quem tiver mais Glória.':'','Cada jogador escolhe Sol ou Lua na sala. Vence o time com mais Glória; aliados não se ferem.','Todos no mesmo time: derrotem o Guardião do Núcleo antes de o tempo acabar.'][P.mode]+(P.rules?' Caos: eventos a cada 45 s e um modificador sorteado a cada onda.':'');go.disabled=wait||!!cd;

@@ -46,6 +46,8 @@ addhero.py / addart.sh leem os blobs de /tmp/claude-tool-results/*/ (imagens tra
 
 - patch34: puxão em heróis mais firme (janela 0,6 s, aviso 'puxado!', 0,3 s preso ao chegar; no teste de 2 jogadores o Agarre do Sombrio traz o alvo de 200 para 66); ranking final guarda quem saiu (endBoard); pedra quebra com 3 a 5 picaretadas (rkNeed pelo deco do tile); página inicial enxuta (cabeçalho com cartão de perfil, heróis em grade de 5 colunas, nome do jogador abaixo do Jogar). Teste de 2 jogadores: /work/tpull.py (copiado em fonte/ como t_pull.py).
 
+- patch35: Perfil em 3 abas (Missões, Heróis, Conquistas) com caixas explicando nível e moedas; cada nível de conta dá 50 moedas; liberar herói também pelo Perfil. Sala: times só aparecem se alguém escolheu Times (pm na presença do menu), em duas colunas Sol/Lua com botão 'Ir para'; o seletor antigo (f-team) fica escondido.
+
 ## Ideias ainda não feitas
 - Caçadora: companheiro animal domado (ideia do dono, não feita).
 - Versão simples: redesenhar criaturas uma a uma; dar o mesmo movimento aos chefes; capa e cabelo dos heróis reagindo mais.

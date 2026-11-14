@@ -22,5 +22,6 @@ python3 patch31.py
 python3 patch32.py
 python3 patch33.py
 python3 patch34.py
+python3 patch35.py
 rm -f game18.js game19.js
 echo "__d em index.html: $(grep -c __d index.html || true)"
