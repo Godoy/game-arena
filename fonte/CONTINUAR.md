@@ -44,6 +44,8 @@ addhero.py / addart.sh leem os blobs de /tmp/claude-tool-results/*/ (imagens tra
 - patch33: Zero virou herói de longe e frágil (400 de vida, alcance 200, bombinha com estilhaço de 40% em volta); Grude com braços curvados no abraço (bf 1024; apertos a cada 0,6 s) e efeito 'bite'; loja de visuais no Perfil (Eco 250, Prisma 400: paleta do herói com matiz girado, skinOf); heróis a liberar por 300 moedas (jogador novo começa com 4; quem já tinha save mantém os 9; OLDP); nível da conta na lista da sala (al) e visual equipado enviado na presença (sk).
 - Falta da rodada: desafio do dia com semente fixa.
 
+- patch34: puxão em heróis mais firme (janela 0,6 s, aviso 'puxado!', 0,3 s preso ao chegar; no teste de 2 jogadores o Agarre do Sombrio traz o alvo de 200 para 66); ranking final guarda quem saiu (endBoard); pedra quebra com 3 a 5 picaretadas (rkNeed pelo deco do tile); página inicial enxuta (cabeçalho com cartão de perfil, heróis em grade de 5 colunas, nome do jogador abaixo do Jogar). Teste de 2 jogadores: /work/tpull.py (copiado em fonte/ como t_pull.py).
+
 ## Ideias ainda não feitas
 - Caçadora: companheiro animal domado (ideia do dono, não feita).
 - Versão simples: redesenhar criaturas uma a uma; dar o mesmo movimento aos chefes; capa e cabelo dos heróis reagindo mais.
