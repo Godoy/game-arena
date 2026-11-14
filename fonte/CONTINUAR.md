@@ -37,6 +37,10 @@ addhero.py / addart.sh leem os blobs de /tmp/claude-tool-results/*/ (imagens tra
 
 - patch30: 8º herói, Sentinela (robô blindado; o dono citou RoboCop como inspiração, desenho e nome próprios). 540 de vida, tiro rápido e fraco (16 a cada 0,42 s, alcance 210), o mais lento (172). Raio Perfurante 8 s (4,2× o ataque em linha de 420, lentidão leve). Modo Cerco 60 s (6 s: +80% cadência, +70 alcance, -30% dano sofrido, metade da velocidade). bf 256 = cerco, 512 = escudo.
 
+- patch31: 9º herói, Grude (monstro peludo de braços compridos; inspiração citada: Huggy Wuggy; desenho/nome próprios, tom amigável). 600 de vida, corpo a corpo de alcance 80. Abraço 9 s (puxa e aperta 3×, 1,1× o ataque cada; criaturas presas, heróis presos só no 1º aperto e lentos depois; H.hug). Mordidão 60 s (7× o ataque em cone curto; cura 15% se acertar).
+- patch32: progresso entre partidas no aparelho (localStorage 'arena-nexus-meta'): conta com nível, maestria por herói, 3 missões do dia + 1 da semana, baú de fim de partida (moedas, 4 raridades), recordes, 12 conquistas, tela Perfil. Sem punição por faltar (só +50% na 1ª partida do dia). Gancho de teste: window.__end() no site/.
+- PRÓXIMA RODADA combinada: loja para gastar moedas (skins/títulos), heróis a desbloquear (sem tirar os que o jogador já usa), desafio do dia com semente fixa, nível da conta ao lado do nome na sala, modo ondas.
+
 ## Ideias ainda não feitas
 - Caçadora: companheiro animal domado (ideia do dono, não feita).
 - Versão simples: redesenhar criaturas uma a uma; dar o mesmo movimento aos chefes; capa e cabelo dos heróis reagindo mais.
